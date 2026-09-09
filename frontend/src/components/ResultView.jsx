@@ -142,31 +142,33 @@ export default function ResultView({ result }) {
         </div>
       </section>
 
-      <section className="rec-section rec-section--food">
-        <h3>{recommendation.food_section_title || '현지인 숨은 맛집'}</h3>
-        <div className="card-grid">
-          {recommendation.local_restaurants.map((place) => (
-            <article className="rec-card" key={place.name}>
-              {place.photo_url && (
-                <img className="rec-card-photo" src={place.photo_url} alt={place.name} loading="lazy" />
-              )}
-              <div className="rec-card-body">
-                <h4>{place.name}</h4>
-                <p>{place.menu}</p>
-                <p className="why">{place.why_this_weather}</p>
-              </div>
-              <a
-                className="map-link"
-                href={kakaoMapSearchUrl(region, place.name)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                지도에서 보기 ↗
-              </a>
-            </article>
-          ))}
-        </div>
-      </section>
+      {recommendation.local_restaurants && recommendation.local_restaurants.length > 0 && (
+        <section className="rec-section rec-section--food">
+          <h3>{recommendation.food_section_title || '현지인 숨은 맛집'}</h3>
+          <div className="card-grid">
+            {recommendation.local_restaurants.map((place) => (
+              <article className="rec-card" key={place.name}>
+                {place.photo_url && (
+                  <img className="rec-card-photo" src={place.photo_url} alt={place.name} loading="lazy" />
+                )}
+                <div className="rec-card-body">
+                  <h4>{place.name}</h4>
+                  <p>{place.menu}</p>
+                  <p className="why">{place.why_this_weather}</p>
+                </div>
+                <a
+                  className="map-link"
+                  href={kakaoMapSearchUrl(region, place.name)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  지도에서 보기 ↗
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
