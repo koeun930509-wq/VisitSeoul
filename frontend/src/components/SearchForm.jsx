@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 const POPULAR_REGIONS = ['서울', '부산', '제주도', '강릉', '전주', '경주', '여수', '속초']
 const MAX_FORECAST_DAYS = 16
 const MAX_TRIP_NIGHTS = 6
+const INTERESTS = ['문화관광', '쇼핑', '숙박', '역사관광', '음식', '자연관광', '체험관광', '축제/공연/행사']
 
 function toDateInputValue(date) {
   const y = date.getFullYear()
@@ -23,6 +24,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
   const [nights, setNights] = useState(0)
   const [showRegionList, setShowRegionList] = useState(false)
   const [regionReadOnly, setRegionReadOnly] = useState(true)
+  const [interests, setInterests] = useState([])
 
   useEffect(() => {
     if (presetRegion) setRegion(presetRegion)
@@ -47,6 +49,12 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
     e?.preventDefault?.()
     if (!region.trim() || !startDate) return
     onSubmit({ region: region.trim(), date: startDate, endDate })
+  }
+
+  function toggleInterest(interest) {
+    setInterests((prev) =>
+      prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest]
+    )
   }
 
   function handleRegionKeyDown(e) {
@@ -169,6 +177,22 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
             `날씨 예보 특성상 오늘부터 ${MAX_FORECAST_DAYS}일 이내 날짜만 선택할 수 있어요.`
           )}
         </p>
+      </div>
+
+      <div className="field">
+        <label>주요 관심사</label>
+        <div className="interest-grid">
+          {INTERESTS.map((interest) => (
+            <label key={interest} className="interest-chip">
+              <input
+                type="checkbox"
+                checked={interests.includes(interest)}
+                onChange={() => toggleInterest(interest)}
+              />
+              <span>{interest}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       <button type="button" disabled={loading} onClick={handleSubmit}>
