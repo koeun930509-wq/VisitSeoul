@@ -6,11 +6,23 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from pipeline import get_travel_recommendation
+from services.exim_service import get_exchange_rates
 from services.kakao_service import reverse_geocode
 from services.visitseoul_service import get_contents
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route("/api/exchange-rate", methods=["GET"])
+def exchange_rate_endpoint():
+    try:
+        rates = get_exchange_rates()
+        return jsonify({"rates": rates})
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "환율 조회 중 오류가 발생했습니다.", "detail": str(e)}), 500
 
 
 @app.route("/api/reverse-geocode", methods=["GET"])
