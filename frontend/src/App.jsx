@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import SearchForm from './components/SearchForm'
 import ResultView from './components/ResultView'
 import Toolbar from './components/Toolbar'
+import SeoulEvents from './components/SeoulEvents'
 import { API_BASE } from './apiBase'
 import './App.css'
 
@@ -12,6 +13,7 @@ function App() {
   const [showTopBtn, setShowTopBtn] = useState(false)
   const [language, setLanguage] = useState('ko')
   const [presetRegion, setPresetRegion] = useState('')
+  const [interests, setInterests] = useState([])
 
   useEffect(() => {
     function handleScroll() {
@@ -50,11 +52,19 @@ function App() {
 
       <div className="search-section">
         <Toolbar language={language} onLanguageChange={setLanguage} onLocate={setPresetRegion} />
-        <SearchForm onSubmit={handleSearch} loading={loading} presetRegion={presetRegion} />
+        <SearchForm
+          onSubmit={handleSearch}
+          loading={loading}
+          presetRegion={presetRegion}
+          interests={interests}
+          onInterestsChange={setInterests}
+        />
       </div>
 
       {error && <p className="error">{error}</p>}
       {result && <ResultView result={result} />}
+
+      {interests.includes('축제/공연/행사') && <SeoulEvents />}
 
       <footer className="app-footer">
         <p>Copyright(c) VividSoul. All rights reserved.</p>

@@ -18,13 +18,12 @@ function addDays(dateStr, days) {
   return toDateInputValue(d)
 }
 
-export default function SearchForm({ onSubmit, loading, presetRegion }) {
+export default function SearchForm({ onSubmit, loading, presetRegion, interests, onInterestsChange }) {
   const [region, setRegion] = useState('')
   const [startDate, setStartDate] = useState('')
   const [nights, setNights] = useState(0)
   const [showRegionList, setShowRegionList] = useState(false)
   const [regionReadOnly, setRegionReadOnly] = useState(true)
-  const [interests, setInterests] = useState([])
 
   useEffect(() => {
     if (presetRegion) setRegion(presetRegion)
@@ -56,8 +55,10 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
   }
 
   function toggleInterest(interest) {
-    setInterests((prev) =>
-      prev.includes(interest) ? prev.filter((i) => i !== interest) : [...prev, interest]
+    onInterestsChange(
+      interests.includes(interest)
+        ? interests.filter((i) => i !== interest)
+        : [...interests, interest]
     )
   }
 
