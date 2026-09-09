@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const POPULAR_REGIONS = ['서울', '부산', '제주도', '강릉', '전주', '경주', '여수', '속초']
 const MAX_FORECAST_DAYS = 16
@@ -17,12 +17,16 @@ function addDays(dateStr, days) {
   return toDateInputValue(d)
 }
 
-export default function SearchForm({ onSubmit, loading }) {
+export default function SearchForm({ onSubmit, loading, presetRegion }) {
   const [region, setRegion] = useState('')
   const [startDate, setStartDate] = useState('')
   const [nights, setNights] = useState(0)
   const [showRegionList, setShowRegionList] = useState(false)
   const [regionReadOnly, setRegionReadOnly] = useState(true)
+
+  useEffect(() => {
+    if (presetRegion) setRegion(presetRegion)
+  }, [presetRegion])
 
   const { min, max } = useMemo(() => {
     const today = new Date()

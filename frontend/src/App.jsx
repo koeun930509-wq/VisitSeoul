@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import SearchForm from './components/SearchForm'
 import ResultView from './components/ResultView'
+import Toolbar from './components/Toolbar'
 import './App.css'
 
 const API_BASE =
@@ -11,6 +12,8 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showTopBtn, setShowTopBtn] = useState(false)
+  const [language, setLanguage] = useState('ko')
+  const [presetRegion, setPresetRegion] = useState('')
 
   useEffect(() => {
     function handleScroll() {
@@ -47,7 +50,10 @@ function App() {
         <p>지역과 날짜를 선택하면 날씨에 맞는 숨은 명소·맛집을 추천해드려요.</p>
       </header>
 
-      <SearchForm onSubmit={handleSearch} loading={loading} />
+      <div className="search-section">
+        <Toolbar language={language} onLanguageChange={setLanguage} onLocate={setPresetRegion} />
+        <SearchForm onSubmit={handleSearch} loading={loading} presetRegion={presetRegion} />
+      </div>
 
       {error && <p className="error">{error}</p>}
       {result && <ResultView result={result} />}
