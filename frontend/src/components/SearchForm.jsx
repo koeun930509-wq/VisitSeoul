@@ -166,15 +166,15 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
             <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <p className="hint">
+        <p className="hint hint-right">
           {startDate ? (
             <>
               {startDate} ~ {endDate}
               <br />
-              날씨 예보는 오늘부터 {MAX_FORECAST_DAYS}일 이내만 제공돼요.
+              오늘부터 {MAX_FORECAST_DAYS}일 이내 날짜만 선택 가능
             </>
           ) : (
-            `날씨 예보 특성상 오늘부터 ${MAX_FORECAST_DAYS}일 이내 날짜만 선택할 수 있어요.`
+            `오늘부터 ${MAX_FORECAST_DAYS}일 이내 날짜만 선택 가능`
           )}
         </p>
       </div>

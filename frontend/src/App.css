@@ -410,6 +410,10 @@
   margin-top: 6px;
 }
 
+.hint-right {
+  text-align: right;
+}
+
 .search-form button {
   font: inherit;
   font-weight: 600;
