@@ -47,12 +47,17 @@ def _get_client() -> genai.Client:
     return _client
 
 
-def _build_prompt(region: str, weather: dict, count: int) -> str:
+def _build_prompt(region: str, weather: dict, count: int, interests: list[str]) -> str:
+    interest_line = ""
+    if interests:
+        interest_list = ", ".join(interests)
+        interest_line = f"\n사용자가 선택한 주요 관심사: {interest_list}\n- 위 관심사와 관련된 장소·맛집 위주로 추천하세요.\n"
+
     return f"""당신은 국내 지역 여행 전문가입니다. 아래 조건에 맞는 추천을 한국어로 작성하세요.
 
 여행 지역: {region}
 날씨: {weather['condition']}, 최저 {weather['temp_min']}도 / 최고 {weather['temp_max']}도, 강수확률 {weather['pop']}%
-
+{interest_line}
 요구사항:
 - weather_desc: 위 날씨 조건을 한 문장으로 요약하세요.
 - spot_reason: 이 날씨에서 어떤 장소들을 추천하는지 한 문장으로 요약하세요 (예: 실내 활동 위주 추천, 야외 활동 위주 추천).
@@ -62,13 +67,13 @@ def _build_prompt(region: str, weather: dict, count: int) -> str:
 """
 
 
-def generate_recommendations(region: str, weather: dict, count: int = 3) -> dict:
+def generate_recommendations(region: str, weather: dict, count: int = 3, interests: list[str] | None = None) -> dict:
     client = _get_client()
     model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
     response = client.models.generate_content(
         model=model,
-        contents=_build_prompt(region, weather, count),
+        contents=_build_prompt(region, weather, count, interests or []),
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
             response_schema=RECOMMENDATION_SCHEMA,

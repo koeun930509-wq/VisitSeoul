@@ -52,12 +52,13 @@ def recommend():
     region = (data.get("region") or "").strip()
     date = (data.get("date") or "").strip()
     end_date = (data.get("endDate") or "").strip() or None
+    interests = [i for i in (data.get("interests") or []) if isinstance(i, str) and i.strip()]
 
     if not region or not date:
         return jsonify({"error": "region과 date는 필수입니다."}), 400
 
     try:
-        result = get_travel_recommendation(region, date, end_date)
+        result = get_travel_recommendation(region, date, end_date, interests)
         return jsonify(result)
     except ValueError as e:
         return jsonify({"error": str(e)}), 400

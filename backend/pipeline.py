@@ -10,7 +10,9 @@ from services.places_service import attach_photos
 from services.weather_service import get_weather_for_period
 
 
-def get_travel_recommendation(region: str, start_date: str, end_date: str | None = None) -> dict:
+def get_travel_recommendation(
+    region: str, start_date: str, end_date: str | None = None, interests: list[str] | None = None
+) -> dict:
     """region의 start_date~end_date(생략 시 start_date와 동일한 하루) 기간에 대한
     날씨와 추천을 반환한다. 추천은 첫날 날씨를 기준으로 생성한다.
     """
@@ -20,7 +22,7 @@ def get_travel_recommendation(region: str, start_date: str, end_date: str | None
 
     location = geocode_region(region)
     weather_by_day = get_weather_for_period(location["lat"], location["lon"], start_date, end_date)
-    recommendation = generate_recommendations(region, weather_by_day[0], spot_count)
+    recommendation = generate_recommendations(region, weather_by_day[0], spot_count, interests or [])
     recommendation["hidden_spots"] = attach_photos(region, recommendation["hidden_spots"])
     recommendation["local_restaurants"] = attach_photos(region, recommendation["local_restaurants"])
     return {

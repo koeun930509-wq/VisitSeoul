@@ -31,7 +31,7 @@ function App() {
       const res = await fetch(`${API_BASE}/api/recommend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ region, date, endDate }),
+        body: JSON.stringify({ region, date, endDate, interests }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || '추천을 불러오지 못했습니다.')
