@@ -15,3 +15,5 @@ frontend/dist/
 
 # Editor / tool config
 .claude/
+.vercel
+.env*
