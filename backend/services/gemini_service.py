@@ -11,6 +11,8 @@ RECOMMENDATION_SCHEMA = {
     "properties": {
         "weather_desc": {"type": "string"},
         "spot_reason": {"type": "string"},
+        "spot_section_title": {"type": "string"},
+        "food_section_title": {"type": "string"},
         "hidden_spots": {
             "type": "array",
             "items": {
@@ -36,7 +38,14 @@ RECOMMENDATION_SCHEMA = {
             },
         },
     },
-    "required": ["weather_desc", "spot_reason", "hidden_spots", "local_restaurants"],
+    "required": [
+        "weather_desc",
+        "spot_reason",
+        "spot_section_title",
+        "food_section_title",
+        "hidden_spots",
+        "local_restaurants",
+    ],
 }
 
 
@@ -49,9 +58,16 @@ def _get_client() -> genai.Client:
 
 def _build_prompt(region: str, weather: dict, count: int, interests: list[str]) -> str:
     interest_line = ""
+    title_guide = '- spot_section_title: 명소 섹션의 제목을 지으세요 (기본값 예시: "숨겨진 현지 명소").\n- food_section_title: 맛집 섹션의 제목을 지으세요 (기본값 예시: "현지인 숨은 맛집").\n'
     if interests:
         interest_list = ", ".join(interests)
         interest_line = f"\n사용자가 선택한 주요 관심사: {interest_list}\n- 위 관심사와 관련된 장소·맛집 위주로 추천하세요.\n"
+        title_guide = (
+            f'- spot_section_title: "{interest_list}" 관심사가 드러나는 명소 섹션 제목을 8자 내외로 지으세요 '
+            f'(예: 역사관광이면 "역사가 숨쉬는 명소", 자연관광이면 "자연 속 숨은 명소").\n'
+            f'- food_section_title: "{interest_list}" 관심사가 드러나는 맛집 섹션 제목을 8자 내외로 지으세요 '
+            f'(예: 음식이면 "현지인이 인정한 맛집").\n'
+        )
 
     return f"""당신은 국내 지역 여행 전문가입니다. 아래 조건에 맞는 추천을 한국어로 작성하세요.
 
@@ -61,7 +77,7 @@ def _build_prompt(region: str, weather: dict, count: int, interests: list[str]) 
 요구사항:
 - weather_desc: 위 날씨 조건을 한 문장으로 요약하세요.
 - spot_reason: 이 날씨에서 어떤 장소들을 추천하는지 한 문장으로 요약하세요 (예: 실내 활동 위주 추천, 야외 활동 위주 추천).
-- 관광 안내 책자에 잘 나오지 않는 "숨겨진 현지 명소" {count}곳을 추천하세요.
+{title_guide}- 관광 안내 책자에 잘 나오지 않는 "숨겨진 현지 명소" {count}곳을 추천하세요.
 - 현지인이 즐겨 찾는 "숨은 맛집" {count}곳을 추천하세요.
 - 각 추천마다 위 날씨 조건에서 왜 그 장소가 적합한지 이유를 함께 제시하세요 (예: 비/폭염이면 실내·그늘 위주, 맑고 선선하면 야외 위주).
 """

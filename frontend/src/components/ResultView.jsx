@@ -117,7 +117,7 @@ export default function ResultView({ result }) {
       </section>
 
       <section className="rec-section rec-section--spots">
-        <h3>숨겨진 현지 명소</h3>
+        <h3>{recommendation.spot_section_title || '숨겨진 현지 명소'}</h3>
         <div className="card-grid">
           {recommendation.hidden_spots.map((spot) => (
             <article className="rec-card" key={spot.name}>
@@ -143,7 +143,7 @@ export default function ResultView({ result }) {
       </section>
 
       <section className="rec-section rec-section--food">
-        <h3>현지인 숨은 맛집</h3>
+        <h3>{recommendation.food_section_title || '현지인 숨은 맛집'}</h3>
         <div className="card-grid">
           {recommendation.local_restaurants.map((place) => (
             <article className="rec-card" key={place.name}>
