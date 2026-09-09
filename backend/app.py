@@ -6,9 +6,27 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from pipeline import get_travel_recommendation
+from services.kakao_service import reverse_geocode
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.route("/api/reverse-geocode", methods=["GET"])
+def reverse_geocode_endpoint():
+    try:
+        lat = float(request.args.get("lat", ""))
+        lon = float(request.args.get("lon", ""))
+    except ValueError:
+        return jsonify({"error": "lat, lon은 필수 숫자 파라미터입니다."}), 400
+
+    try:
+        address = reverse_geocode(lat, lon)
+        return jsonify({"address": address})
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": "주소 조회 중 오류가 발생했습니다.", "detail": str(e)}), 500
 
 
 @app.route("/api/recommend", methods=["POST"])

@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react'
 import SearchForm from './components/SearchForm'
 import ResultView from './components/ResultView'
 import Toolbar from './components/Toolbar'
+import { API_BASE } from './apiBase'
 import './App.css'
-
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.PROD ? '' : 'http://localhost:5000')
 
 function App() {
   const [result, setResult] = useState(null)

@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { API_BASE } from '../apiBase'
 
-// TODO: 실제 서비스에서는 정식 역지오코딩 API(카카오맵 등)로 교체 예정.
-async function reverseGeocodeMock(latitude, longitude) {
-  await new Promise((resolve) => setTimeout(resolve, 400))
-  return `현재 위치 (${latitude.toFixed(2)}, ${longitude.toFixed(2)})`
+async function reverseGeocode(latitude, longitude) {
+  const res = await fetch(`${API_BASE}/api/reverse-geocode?lat=${latitude}&lon=${longitude}`)
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || '주소를 불러오지 못했습니다.')
+  return data.address
 }
 
 export default function LocationToggle({ onLocate }) {
@@ -28,10 +30,15 @@ export default function LocationToggle({ onLocate }) {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords
-        const place = await reverseGeocodeMock(latitude, longitude)
-        onLocate?.(place)
-        setActive(true)
-        setLoading(false)
+        try {
+          const place = await reverseGeocode(latitude, longitude)
+          onLocate?.(place)
+          setActive(true)
+        } catch (err) {
+          setError(err.message)
+        } finally {
+          setLoading(false)
+        }
       },
       () => {
         setError('위치 권한을 허용해주세요.')

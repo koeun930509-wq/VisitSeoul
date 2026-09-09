@@ -4,6 +4,7 @@ import requests
 
 ADDRESS_SEARCH_URL = "https://dapi.kakao.com/v2/local/search/address.json"
 KEYWORD_SEARCH_URL = "https://dapi.kakao.com/v2/local/search/keyword.json"
+COORD2ADDRESS_URL = "https://dapi.kakao.com/v2/local/geo/coord2address.json"
 
 
 def geocode_region(region: str) -> dict:
@@ -34,3 +35,28 @@ def _search(url: str, headers: dict, query: str) -> list:
     resp = requests.get(url, headers=headers, params={"query": query}, timeout=5)
     resp.raise_for_status()
     return resp.json().get("documents", [])
+
+
+def reverse_geocode(lat: float, lon: float) -> str:
+    """위도/경도를 카카오맵 API로 '시/도 시/군/구 동/읍/면' 형태 주소로 변환한다."""
+    api_key = os.environ["KAKAO_REST_API_KEY"]
+    headers = {"Authorization": f"KakaoAK {api_key}"}
+
+    resp = requests.get(
+        COORD2ADDRESS_URL,
+        headers=headers,
+        params={"x": lon, "y": lat},
+        timeout=5,
+    )
+    resp.raise_for_status()
+    documents = resp.json().get("documents", [])
+    if not documents:
+        raise ValueError("해당 좌표에 대한 주소 정보를 찾을 수 없습니다.")
+
+    address = documents[0]["address"]
+    parts = [
+        address.get("region_1depth_name"),
+        address.get("region_2depth_name"),
+        address.get("region_3depth_name"),
+    ]
+    return " ".join(p for p in parts if p)
