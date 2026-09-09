@@ -92,6 +92,10 @@ body::after {
   inset: 0;
   z-index: -1;
   background: url("./assets/skyline.png") bottom center / 100% auto no-repeat;
+
+  @media (max-width: 640px) {
+    background-size: 140% auto;
+  }
 }
 
 #root {
