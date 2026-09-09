@@ -147,6 +147,12 @@
   white-space: nowrap;
 }
 
+.language-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .language-select {
   font: inherit;
   font-size: 13px;
@@ -159,6 +165,15 @@
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
+}
+
+.language-select-arrow {
+  position: absolute;
+  right: 8px;
+  width: 14px;
+  height: 14px;
+  color: var(--text-h);
+  pointer-events: none;
 }
 
 .search-form {

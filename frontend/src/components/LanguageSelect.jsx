@@ -20,6 +20,9 @@ export default function LanguageSelect({ value, onChange }) {
           </option>
         ))}
       </select>
+      <svg className="language-select-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </div>
   )
 }
