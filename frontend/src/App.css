@@ -391,8 +391,8 @@
 }
 
 .interest-chip:has(input:checked) {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff;
+  background: var(--accent-bg);
+  color: var(--accent);
 }
 
 .interest-chip:has(input:focus-visible) {
