@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import SearchForm from './components/SearchForm'
 import ResultView from './components/ResultView'
 import Toolbar from './components/Toolbar'
-import SeoulEvents from './components/SeoulEvents'
 import { API_BASE } from './apiBase'
 import './App.css'
 
@@ -56,8 +55,6 @@ function App() {
 
       {error && <p className="error">{error}</p>}
       {result && <ResultView result={result} />}
-
-      <SeoulEvents />
 
       <footer className="app-footer">
         <p>Copyright(c) VividSoul. All rights reserved.</p>
