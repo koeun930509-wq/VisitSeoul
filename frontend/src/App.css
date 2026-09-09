@@ -245,6 +245,17 @@
   color: var(--text-h);
 }
 
+.field-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.field-label-row .hint {
+  margin: 0;
+}
+
 .field input,
 .field select {
   width: 100%;

@@ -149,7 +149,10 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
       </div>
 
       <div className="field">
-        <label htmlFor="nights">일정</label>
+        <div className="field-label-row">
+          <label htmlFor="nights">일정</label>
+          <span className="hint">오늘부터 {MAX_FORECAST_DAYS}일 이내 날짜만 선택 가능</span>
+        </div>
         <div className="input-arrow-wrap">
           <select
             id="nights"
@@ -166,17 +169,11 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
             <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <p className="hint hint-right">
-          {startDate ? (
-            <>
-              {startDate} ~ {endDate}
-              <br />
-              오늘부터 {MAX_FORECAST_DAYS}일 이내 날짜만 선택 가능
-            </>
-          ) : (
-            `오늘부터 ${MAX_FORECAST_DAYS}일 이내 날짜만 선택 가능`
-          )}
-        </p>
+        {startDate && (
+          <p className="hint hint-right">
+            {startDate} ~ {endDate}
+          </p>
+        )}
       </div>
 
       <div className="field">
