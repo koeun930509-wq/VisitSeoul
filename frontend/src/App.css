@@ -154,26 +154,70 @@
 }
 
 .language-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font: inherit;
   font-size: 13px;
   font-weight: 600;
-  padding: 6px 28px 6px 10px;
+  padding: 6px 10px 6px 14px;
   border: none;
   border-radius: 999px;
   background: var(--surface-strong);
   color: var(--text-h);
-  appearance: none;
-  -webkit-appearance: none;
   cursor: pointer;
 }
 
 .language-select-arrow {
-  position: absolute;
-  right: 8px;
   width: 14px;
   height: 14px;
   color: var(--text-h);
   pointer-events: none;
+}
+
+.language-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 6px;
+  min-width: 120px;
+  list-style: none;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: rgba(60, 70, 110, 0.18) 0 10px 25px -5px, rgba(60, 70, 110, 0.1) 0 4px 6px -2px;
+}
+
+.language-options li {
+  margin: 0;
+  padding: 0;
+}
+
+.language-options li button {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  outline: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.language-options li button:hover {
+  background: var(--accent-bg);
+}
+
+.language-options li button.is-selected {
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .search-form {
