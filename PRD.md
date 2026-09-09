@@ -1,4 +1,4 @@
-# 팀트립고고 (TripGoGo) PRD
+# 팀트립고고 (VividSoul) PRD
 
 - 작성자: 이은정, 이고은
 - 문서 버전: v1.0

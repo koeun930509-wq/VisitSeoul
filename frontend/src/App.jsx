@@ -43,7 +43,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>TripGoGo</h1>
+        <h1>VividSoul</h1>
         <p>지역과 날짜를 선택하면 날씨에 맞는 숨은 명소·맛집을 추천해드려요.</p>
       </header>
 
@@ -53,7 +53,7 @@ function App() {
       {result && <ResultView result={result} />}
 
       <footer className="app-footer">
-        <p>Copyright(c) TripGoGo. All rights reserved.</p>
+        <p>Copyright(c) VividSoul. All rights reserved.</p>
       </footer>
 
       {showTopBtn && (
