@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import { SEOUL_DISTRICTS, isSeoulRegion } from '../seoulDistricts'
 
-const POPULAR_REGIONS = ['서울', '부산', '제주도', '강릉', '전주', '경주', '여수', '속초']
 const MAX_FORECAST_DAYS = 16
 const MAX_TRIP_NIGHTS = 6
 const INTERESTS = ['문화관광', '쇼핑', '숙박', '역사관광', '음식', '자연관광', '체험관광', '축제/공연/행사']
@@ -48,6 +48,10 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
   function handleSubmit(e) {
     e?.preventDefault?.()
     if (!region.trim() || !startDate) return
+    if (!isSeoulRegion(region)) {
+      window.alert('서울 이외에 지역은 입력되지 않습니다')
+      return
+    }
     onSubmit({ region: region.trim(), date: startDate, endDate })
   }
 
@@ -95,7 +99,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
               setTimeout(() => setShowRegionList(false), 100)
             }}
             onKeyDown={handleRegionKeyDown}
-            placeholder="예: 제주도, 부산 해운대"
+            placeholder="예: 강남구, 마포구"
             required
           />
           <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -104,7 +108,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion }) {
         </div>
         {showRegionList && (
           <ul className="region-suggestions">
-            {POPULAR_REGIONS.map((r) => (
+            {SEOUL_DISTRICTS.map((r) => (
               <li key={r}>
                 <button
                   type="button"

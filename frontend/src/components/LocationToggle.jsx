@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { API_BASE } from '../apiBase'
+import { isSeoulRegion } from '../seoulDistricts'
 
 async function reverseGeocode(latitude, longitude) {
   const res = await fetch(`${API_BASE}/api/reverse-geocode?lat=${latitude}&lon=${longitude}`)
@@ -32,6 +33,10 @@ export default function LocationToggle({ onLocate }) {
         const { latitude, longitude } = position.coords
         try {
           const place = await reverseGeocode(latitude, longitude)
+          if (!isSeoulRegion(place)) {
+            window.alert('서울 이외에 지역은 입력되지 않습니다')
+            return
+          }
           onLocate?.(place)
           setActive(true)
         } catch (err) {
