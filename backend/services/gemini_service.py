@@ -8,6 +8,13 @@ _client = None
 
 DEFAULT_INTERESTS = ["문화관광", "쇼핑", "숙박", "역사관광", "음식", "자연관광", "체험관광", "축제/공연/행사"]
 
+LANGUAGE_NAMES = {
+    "ko": "한국어",
+    "en": "English",
+    "ja": "日本語",
+    "zh": "简体中文",
+}
+
 _SPOT_ITEM_SCHEMA = {
     "type": "object",
     "properties": {
@@ -64,13 +71,20 @@ def _get_client() -> genai.Client:
     return _client
 
 
-def _build_prompt(region: str, weather: dict, count: int, interests: list[str]) -> str:
+def _build_prompt(region: str, weather: dict, count: int, interests: list[str], language: str) -> str:
     interest_list = ", ".join(interests)
     category_lines = "\n".join(
         f'- "{interest}": section_title은 이 관심사가 드러나는 8자 내외 제목(예: 역사관광이면 "역사가 숨쉬는 명소", '
         f'음식이면 "현지인이 인정한 맛집"), items는 {count}곳'
         + ("(각 항목은 실제 맛집 이름과 대표 메뉴)" if interest == "음식" else "")
         for interest in interests
+    )
+    language_name = LANGUAGE_NAMES.get(language, LANGUAGE_NAMES["ko"])
+    language_line = (
+        ""
+        if language == "ko"
+        else f"\n중요: categories 안의 section_title, name, description/menu, why_this_weather를 포함한 "
+        f"모든 응답 텍스트를 {language_name}로 작성하세요 (지역명·고유명사도 가능하면 {language_name} 표기 병기).\n"
     )
 
     return f"""당신은 국내 지역 여행 전문가입니다. 아래 조건에 맞는 추천을 한국어로 작성하세요.
@@ -79,7 +93,7 @@ def _build_prompt(region: str, weather: dict, count: int, interests: list[str]) 
 날씨: {weather['condition']}, 최저 {weather['temp_min']}도 / 최고 {weather['temp_max']}도, 강수확률 {weather['pop']}%
 
 사용자가 선택한 주요 관심사: {interest_list}
-
+{language_line}
 요구사항:
 - weather_desc: 위 날씨 조건을 한 문장으로 요약하세요.
 - spot_reason: 이 날씨에서 어떤 장소들을 추천하는지 한 문장으로 요약하세요 (예: 실내 활동 위주 추천, 야외 활동 위주 추천).
@@ -89,15 +103,19 @@ def _build_prompt(region: str, weather: dict, count: int, interests: list[str]) 
 """
 
 
-def generate_recommendations(region: str, weather: dict, count: int = 3, interests: list[str] | None = None) -> dict:
+def generate_recommendations(
+    region: str, weather: dict, count: int = 3, interests: list[str] | None = None, language: str = "ko"
+) -> dict:
     interests = interests or DEFAULT_INTERESTS
+    if language not in LANGUAGE_NAMES:
+        language = "ko"
 
     client = _get_client()
     model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
     response = client.models.generate_content(
         model=model,
-        contents=_build_prompt(region, weather, count, interests),
+        contents=_build_prompt(region, weather, count, interests, language),
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
             response_schema=_build_schema(interests),

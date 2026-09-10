@@ -8,7 +8,7 @@ from flask_cors import CORS
 from pipeline import get_travel_recommendation
 from services.exim_service import get_exchange_rates
 from services.kakao_service import reverse_geocode
-from services.visitseoul_service import get_contents
+from services.visitseoul_service import get_contents, get_festival_contents
 
 app = Flask(__name__)
 CORS(app)
@@ -52,7 +52,10 @@ def seoul_contents_endpoint():
         page_no = 1
 
     try:
-        result = get_contents(keyword=keyword, lang_code_id=lang_code_id, page_no=page_no)
+        if keyword == "축제":
+            result = get_festival_contents(lang_code_id=lang_code_id, page_no=page_no)
+        else:
+            result = get_contents(keyword=keyword, lang_code_id=lang_code_id, page_no=page_no)
         return jsonify(result)
     except Exception as e:
         return jsonify({"error": "관광 콘텐츠 조회 중 오류가 발생했습니다.", "detail": str(e)}), 500
@@ -65,12 +68,13 @@ def recommend():
     date = (data.get("date") or "").strip()
     end_date = (data.get("endDate") or "").strip() or None
     interests = [i for i in (data.get("interests") or []) if isinstance(i, str) and i.strip()]
+    language = (data.get("language") or "ko").strip()
 
     if not region or not date:
         return jsonify({"error": "region과 date는 필수입니다."}), 400
 
     try:
-        result = get_travel_recommendation(region, date, end_date, interests)
+        result = get_travel_recommendation(region, date, end_date, interests, language)
         return jsonify(result)
     except ValueError as e:
         return jsonify({"error": str(e)}), 400

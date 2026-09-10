@@ -31,7 +31,7 @@ function App() {
       const res = await fetch(`${API_BASE}/api/recommend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ region, date, endDate, interests }),
+        body: JSON.stringify({ region, date, endDate, interests, language }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || '추천을 불러오지 못했습니다.')
@@ -64,7 +64,7 @@ function App() {
       {error && <p className="error">{error}</p>}
       {result && <ResultView result={result} />}
 
-      {interests.includes('축제/공연/행사') && <SeoulEvents />}
+      {interests.includes('축제/공연/행사') && <SeoulEvents language={language} />}
 
       <footer className="app-footer">
         <p>Copyright(c) VividSoul. All rights reserved.</p>
