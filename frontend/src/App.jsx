@@ -51,13 +51,14 @@ function App() {
       </header>
 
       <div className="search-section">
-        <Toolbar language={language} onLanguageChange={setLanguage} onLocate={setPresetRegion} />
+        <Toolbar language={language} onLanguageChange={setLanguage} />
         <SearchForm
           onSubmit={handleSearch}
           loading={loading}
           presetRegion={presetRegion}
           interests={interests}
           onInterestsChange={setInterests}
+          onLocate={setPresetRegion}
         />
       </div>
 

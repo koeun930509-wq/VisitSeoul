@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { SEOUL_DISTRICTS, isSeoulRegion } from '../seoulDistricts'
+import LocationToggle from './LocationToggle'
 
 const MAX_FORECAST_DAYS = 16
 const MAX_TRIP_NIGHTS = 6
@@ -18,7 +19,7 @@ function addDays(dateStr, days) {
   return toDateInputValue(d)
 }
 
-export default function SearchForm({ onSubmit, loading, presetRegion, interests, onInterestsChange }) {
+export default function SearchForm({ onSubmit, loading, presetRegion, interests, onInterestsChange, onLocate }) {
   const [region, setRegion] = useState('')
   const [startDate, setStartDate] = useState('')
   const [nights, setNights] = useState(0)
@@ -73,7 +74,10 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
   return (
     <div className="search-form">
       <div className="field region-field">
-        <label htmlFor="region">가고 싶은 지역</label>
+        <div className="field-label-row">
+          <label htmlFor="region">가고 싶은 지역</label>
+          <LocationToggle onLocate={onLocate} />
+        </div>
         <div className="input-arrow-wrap">
           <input
             id="region"

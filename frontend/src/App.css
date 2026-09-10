@@ -97,20 +97,21 @@
   position: relative;
 }
 
-.location-toggle {
+.search-form .location-toggle {
   display: flex;
   align-items: center;
   gap: 4px;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
   padding: 6px 10px;
   border: none;
   border-radius: 999px;
-  background: var(--surface-strong);
-  color: var(--text-h);
+  background: none;
+  color: var(--text);
   cursor: pointer;
+  box-shadow: none;
 }
 
 .location-toggle svg {
@@ -118,9 +119,8 @@
   height: 15px;
 }
 
-.location-toggle.is-active {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #fff;
+.search-form .location-toggle.is-active {
+  color: var(--accent);
 }
 
 .location-toggle:disabled {
