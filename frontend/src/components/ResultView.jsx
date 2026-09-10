@@ -79,7 +79,7 @@ function RecommendationSection({ title, region, items, isPreview, t }) {
 
 export default function ResultView({ result, activeTab, onTabChange, language = 'ko' }) {
   const t = getStrings(language)
-  const { region, weather, weather_by_day: weatherByDay, recommendation } = result
+  const { region, weather, weather_by_day: weatherByDay, hourly_weather: hourlyWeather, recommendation } = result
   const tripDays = weatherByDay && weatherByDay.length > 1 ? weatherByDay : null
   const categoryEntries = Object.entries(recommendation.categories).filter(
     ([category]) => activeTab === ALL_TAB || category === activeTab
@@ -102,7 +102,7 @@ export default function ResultView({ result, activeTab, onTabChange, language = 
         <div className="weather-top">
           <div className="weather-main">
             <div className="weather-main-icon">
-              <WeatherIcon condition={weather.condition} date={weather.date} />
+              <WeatherIcon condition={weather.condition} weatherCode={weather.weather_code} />
             </div>
             <div className="weather-main-info">
               <p className="weather-temp">
@@ -166,7 +166,7 @@ export default function ResultView({ result, activeTab, onTabChange, language = 
                 <div className="daily-forecast-item" key={day.date}>
                   <p className="daily-forecast-date">{day.date}</p>
                   <div className="daily-forecast-icon">
-                    <WeatherIcon condition={day.condition} date={day.date} />
+                    <WeatherIcon condition={day.condition} weatherCode={day.weather_code} />
                   </div>
                   <p className="daily-forecast-condition">{day.condition}</p>
                   <p className="daily-forecast-temp">
@@ -180,6 +180,24 @@ export default function ResultView({ result, activeTab, onTabChange, language = 
             </div>
             <p className="hint">{t.weatherForecastNote(weather.date)}</p>
           </>
+        )}
+
+        {hourlyWeather && hourlyWeather.length > 0 && (
+          <div className="hourly-forecast-wrap">
+            <p className="hourly-forecast-title">{t.hourlyForecastTitle}</p>
+            <div className="hourly-forecast">
+              {hourlyWeather.map((hour) => (
+                <div className="hourly-forecast-item" key={hour.time}>
+                  <p className="hourly-forecast-time">{hour.time}</p>
+                  <div className="hourly-forecast-icon">
+                    <WeatherIcon condition={hour.condition} weatherCode={hour.weather_code} />
+                  </div>
+                  <p className="hourly-forecast-temp">{hour.temp}°</p>
+                  <p className="hourly-forecast-pop">{hour.pop}%</p>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </section>
 

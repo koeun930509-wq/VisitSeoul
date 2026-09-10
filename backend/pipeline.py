@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from services.gemini_service import generate_recommendations
 from services.kakao_service import geocode_region
 from services.places_service import attach_photos
-from services.weather_service import get_weather_for_period
+from services.weather_service import get_hourly_weather, get_weather_for_period
 
 CATEGORY_SPOT_COUNT = 9
 
@@ -37,11 +37,13 @@ def get_travel_recommendation(
         if language == "ko"
         else get_weather_for_period(location["lat"], location["lon"], start_date, end_date, language)
     )
+    hourly_weather = get_hourly_weather(location["lat"], location["lon"], start_date, language)
     return {
         "region": region,
         "location": location,
         "weather": weather_by_day[0],
         "weather_by_day": weather_by_day,
+        "hourly_weather": hourly_weather,
         "recommendation": recommendation,
     }
 

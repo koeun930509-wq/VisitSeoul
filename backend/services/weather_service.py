@@ -135,6 +135,7 @@ def get_weather_for_period(lat: float, lon: float, start_date: str, end_date: st
             {
                 "date": day,
                 "condition": _describe_weather_code(daily["weathercode"][i], language),
+                "weather_code": daily["weathercode"][i],
                 "temp_min": round(daily["temperature_2m_min"][i], 1),
                 "temp_max": temp_max,
                 "pop": pop,
@@ -153,3 +154,40 @@ def get_weather_for_period(lat: float, lon: float, start_date: str, end_date: st
 def get_weather_for_date(lat: float, lon: float, target_date: str) -> dict:
     """단일 날짜 조회 (하위 호환용). get_weather_for_period의 결과 중 첫 항목을 반환한다."""
     return get_weather_for_period(lat, lon, target_date, target_date)[0]
+
+
+HOURLY_STEP = 3
+
+
+def get_hourly_weather(lat: float, lon: float, target_date: str, language: str = "ko") -> list:
+    """Open-Meteo 시간별 예보에서 target_date('YYYY-MM-DD') 하루치를
+    3시간 간격(0, 3, 6, ... 21시)으로 뽑아 반환한다.
+    """
+    resp = requests.get(
+        FORECAST_URL,
+        params={
+            "latitude": lat,
+            "longitude": lon,
+            "hourly": "weathercode,temperature_2m,precipitation_probability",
+            "timezone": "Asia/Seoul",
+            "start_date": target_date,
+            "end_date": target_date,
+        },
+        timeout=5,
+    )
+    resp.raise_for_status()
+    hourly = resp.json()["hourly"]
+
+    results = []
+    for i in range(0, len(hourly["time"]), HOURLY_STEP):
+        results.append(
+            {
+                "time": hourly["time"][i][-5:],  # "HH:MM"
+                "condition": _describe_weather_code(hourly["weathercode"][i], language),
+                "weather_code": hourly["weathercode"][i],
+                "temp": round(hourly["temperature_2m"][i], 1),
+                "pop": round(hourly["precipitation_probability"][i]),
+            }
+        )
+
+    return results
