@@ -42,7 +42,6 @@ export default function ExchangeRateTicker() {
 
   return (
     <div className="exchange-rate-ticker" aria-live="polite">
-      <span className="exchange-rate-badge">환율</span>
       <span className="exchange-rate-flag">{FLAGS[current.code]}</span>
       <span className="exchange-rate-text">
         1 {current.code} = {current.rate.toLocaleString('ko-KR')}원
