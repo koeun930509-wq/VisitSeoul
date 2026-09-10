@@ -1,8 +1,10 @@
 import WeatherIcon from './WeatherIcon'
 import StatIcon from './StatIcon'
 import aiSparkleIcon from '../assets/ai-sparkle.png'
+import { CATEGORIES, ALL_TAB } from '../categories'
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
+const TABS = [ALL_TAB, ...CATEGORIES]
 
 function kakaoMapSearchUrl(region, name) {
   return `https://map.kakao.com/link/search/${encodeURIComponent(`${region} ${name}`)}`
@@ -14,9 +16,12 @@ function formatDateWithWeekday(dateStr) {
   return `${formatted} (${WEEKDAYS[d.getDay()]})`
 }
 
-export default function ResultView({ result }) {
+export default function ResultView({ result, activeTab, onTabChange }) {
   const { region, weather, weather_by_day: weatherByDay, recommendation } = result
   const tripDays = weatherByDay && weatherByDay.length > 1 ? weatherByDay : null
+  const categoryEntries = Object.entries(recommendation.categories).filter(
+    ([category]) => activeTab === ALL_TAB || category === activeTab
+  )
 
   return (
     <div className="result">
@@ -116,7 +121,21 @@ export default function ResultView({ result }) {
         )}
       </section>
 
-      {Object.entries(recommendation.categories).map(([category, { section_title: sectionTitle, items }]) => (
+      <div className="category-tabs">
+        {TABS.map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            className={`category-tab${activeTab === tab ? ' is-active' : ''}`}
+            onClick={() => onTabChange(tab)}
+            aria-pressed={activeTab === tab}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {categoryEntries.map(([category, { section_title: sectionTitle, items }]) => (
         <section className="rec-section" key={category}>
           <h3>{sectionTitle || category}</h3>
           <div className="card-grid">

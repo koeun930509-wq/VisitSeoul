@@ -3,7 +3,6 @@ import { SEOUL_DISTRICTS, SEOUL_DISTRICT_AREAS, isSeoulRegion } from '../seoulDi
 import LocationToggle from './LocationToggle'
 
 const MAX_FORECAST_DAYS = 16
-const INTERESTS = ['문화관광', '쇼핑', '숙박', '역사관광', '음식', '자연관광', '체험관광', '축제/공연/행사']
 
 function toDateInputValue(date) {
   const y = date.getFullYear()
@@ -12,7 +11,7 @@ function toDateInputValue(date) {
   return `${y}-${m}-${d}`
 }
 
-export default function SearchForm({ onSubmit, loading, presetRegion, interests, onInterestsChange, onLocate }) {
+export default function SearchForm({ onSubmit, loading, presetRegion, onLocate }) {
   const [region, setRegion] = useState('')
   const [startDate, setStartDate] = useState('')
   const [showRegionList, setShowRegionList] = useState(false)
@@ -37,14 +36,6 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
       return
     }
     onSubmit({ region: region.trim(), date: startDate, endDate: startDate })
-  }
-
-  function toggleInterest(interest) {
-    onInterestsChange(
-      interests.includes(interest)
-        ? interests.filter((i) => i !== interest)
-        : [...interests, interest]
-    )
   }
 
   function handleRegionKeyDown(e) {
@@ -150,22 +141,6 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
           <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </div>
-      </div>
-
-      <div className="field">
-        <label>주요 관심사</label>
-        <div className="interest-grid">
-          {INTERESTS.map((interest) => (
-            <label key={interest} className="interest-chip">
-              <input
-                type="checkbox"
-                checked={interests.includes(interest)}
-                onChange={() => toggleInterest(interest)}
-              />
-              <span>{interest}</span>
-            </label>
-          ))}
         </div>
       </div>
 
