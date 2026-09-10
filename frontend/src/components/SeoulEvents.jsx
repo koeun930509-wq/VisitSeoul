@@ -3,6 +3,11 @@ import { API_BASE } from '../apiBase'
 import { getStrings } from '../i18n'
 
 const VISITSEOUL_LANG_CODES = { ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN' }
+const DETAIL_URL_TEMPLATE = 'https://korean.visitseoul.net/attractions/detail/{cid}'
+
+function festivalDetailUrl(cid) {
+  return DETAIL_URL_TEMPLATE.replace('{cid}', cid)
+}
 
 export default function SeoulEvents({ language = 'ko' }) {
   const t = getStrings(language)
@@ -49,7 +54,12 @@ export default function SeoulEvents({ language = 'ko' }) {
               <h4>{item.post_sj}</h4>
               <p>{item.sumry}</p>
             </div>
-            <a className="map-link" href="https://visitseoul.net" target="_blank" rel="noreferrer">
+            <a
+              className="map-link"
+              href={festivalDetailUrl(item.cid)}
+              target="_blank"
+              rel="noreferrer"
+            >
               {t.festivalMoreLink}
             </a>
           </article>
