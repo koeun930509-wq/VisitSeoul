@@ -9,7 +9,7 @@ from services.kakao_service import geocode_region
 from services.places_service import attach_photos
 from services.weather_service import get_hourly_weather, get_weather_for_period
 
-CATEGORY_SPOT_COUNT = 9
+CATEGORY_SPOT_COUNT = 6
 
 
 def get_travel_recommendation(
