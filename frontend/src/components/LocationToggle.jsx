@@ -63,13 +63,14 @@ export default function LocationToggle({ onLocate }) {
         aria-pressed={active}
       >
         <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="10" cy="10" r="7.25" stroke="currentColor" strokeWidth="1.5" />
+          <circle cx="10" cy="10" r="2" stroke="currentColor" strokeWidth="1.5" />
           <path
-            d="M10 2.5c-2.9 0-5.25 2.3-5.25 5.15C4.75 11.5 10 17.5 10 17.5s5.25-6 5.25-9.85C15.25 4.8 12.9 2.5 10 2.5Z"
+            d="M10 1.5v3M10 15.5v3M1.5 10h3M15.5 10h3"
             stroke="currentColor"
             strokeWidth="1.5"
-            strokeLinejoin="round"
+            strokeLinecap="round"
           />
-          <circle cx="10" cy="7.7" r="2" stroke="currentColor" strokeWidth="1.5" />
         </svg>
         {loading ? '위치 확인 중…' : '현위치'}
       </button>
