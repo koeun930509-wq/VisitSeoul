@@ -23,9 +23,8 @@ def get_travel_recommendation(
     location = geocode_region(region)
     weather_by_day = get_weather_for_period(location["lat"], location["lon"], start_date, end_date)
     recommendation = generate_recommendations(region, weather_by_day[0], spot_count, interests or [])
-    recommendation["hidden_spots"] = attach_photos(region, recommendation["hidden_spots"])
-    if "local_restaurants" in recommendation:
-        recommendation["local_restaurants"] = attach_photos(region, recommendation["local_restaurants"])
+    for category in recommendation["categories"].values():
+        category["items"] = attach_photos(region, category["items"])
     return {
         "region": region,
         "location": location,

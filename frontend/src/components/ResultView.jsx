@@ -116,49 +116,23 @@ export default function ResultView({ result }) {
         )}
       </section>
 
-      <section className="rec-section rec-section--spots">
-        <h3>{recommendation.spot_section_title || '숨겨진 현지 명소'}</h3>
-        <div className="card-grid">
-          {recommendation.hidden_spots.map((spot) => (
-            <article className="rec-card" key={spot.name}>
-              {spot.photo_url && (
-                <img className="rec-card-photo" src={spot.photo_url} alt={spot.name} loading="lazy" />
-              )}
-              <div className="rec-card-body">
-                <h4>{spot.name}</h4>
-                <p>{spot.description}</p>
-                <p className="why">{spot.why_this_weather}</p>
-              </div>
-              <a
-                className="map-link"
-                href={kakaoMapSearchUrl(region, spot.name)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                지도에서 보기 ↗
-              </a>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {recommendation.local_restaurants && recommendation.local_restaurants.length > 0 && (
-        <section className="rec-section rec-section--food">
-          <h3>{recommendation.food_section_title || '현지인 숨은 맛집'}</h3>
+      {Object.entries(recommendation.categories).map(([category, { section_title: sectionTitle, items }]) => (
+        <section className="rec-section" key={category}>
+          <h3>{sectionTitle || category}</h3>
           <div className="card-grid">
-            {recommendation.local_restaurants.map((place) => (
-              <article className="rec-card" key={place.name}>
-                {place.photo_url && (
-                  <img className="rec-card-photo" src={place.photo_url} alt={place.name} loading="lazy" />
+            {items.map((item) => (
+              <article className="rec-card" key={item.name}>
+                {item.photo_url && (
+                  <img className="rec-card-photo" src={item.photo_url} alt={item.name} loading="lazy" />
                 )}
                 <div className="rec-card-body">
-                  <h4>{place.name}</h4>
-                  <p>{place.menu}</p>
-                  <p className="why">{place.why_this_weather}</p>
+                  <h4>{item.name}</h4>
+                  <p>{item.menu || item.description}</p>
+                  <p className="why">{item.why_this_weather}</p>
                 </div>
                 <a
                   className="map-link"
-                  href={kakaoMapSearchUrl(region, place.name)}
+                  href={kakaoMapSearchUrl(region, item.name)}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -168,7 +142,7 @@ export default function ResultView({ result }) {
             ))}
           </div>
         </section>
-      )}
+      ))}
     </div>
   )
 }
