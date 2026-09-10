@@ -1,5 +1,6 @@
 import json
 import sys
+from concurrent.futures import ThreadPoolExecutor
 
 from dotenv import load_dotenv
 
@@ -28,9 +29,17 @@ def get_travel_recommendation(
     recommendation = generate_recommendations(
         region, weather_by_day_ko[0], CATEGORY_SPOT_COUNT, interests or [], language
     )
-    recommendation["weather_picks"] = attach_photos(recommendation["weather_picks"])
-    for category in recommendation["categories"].values():
-        category["items"] = attach_photos(category["items"])
+
+    category_names = list(recommendation["categories"].keys())
+    with ThreadPoolExecutor(max_workers=len(category_names) + 1) as executor:
+        weather_picks_future = executor.submit(attach_photos, recommendation["weather_picks"])
+        category_futures = {
+            name: executor.submit(attach_photos, recommendation["categories"][name]["items"])
+            for name in category_names
+        }
+        recommendation["weather_picks"] = weather_picks_future.result()
+        for name in category_names:
+            recommendation["categories"][name]["items"] = category_futures[name].result()
 
     weather_by_day = (
         weather_by_day_ko

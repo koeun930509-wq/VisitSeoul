@@ -1,10 +1,12 @@
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 import requests
 
 from services.visitseoul_service import get_contents
 
 DETAIL_URL_TEMPLATE = "https://korean.visitseoul.net/attractions/detail/{cid}"
+MAX_WORKERS = 16
 
 
 def find_visitseoul_content(name: str) -> dict | None:
@@ -25,19 +27,23 @@ def find_visitseoul_content(name: str) -> dict | None:
     return items[0]
 
 
+def _attach_photo(spot: dict) -> dict:
+    content = None
+    try:
+        content = find_visitseoul_content(spot["name"])
+    except requests.RequestException:
+        content = None
+    photo_url = content.get("main_img") if content else None
+    detail_url = DETAIL_URL_TEMPLATE.format(cid=content["cid"]) if content and content.get("cid") else None
+    return {**spot, "photo_url": photo_url, "detail_url": detail_url}
+
+
 def attach_photos(spots: list) -> list:
     """spots(각 항목에 'name' 키가 있는 dict 리스트)에 photo_url, detail_url 필드를 추가해 반환한다.
     비짓서울 API로 검색하며, 실패해도 전체 추천이 실패하지 않도록
-    개별 항목 단위로 예외를 흡수한다.
+    개별 항목 단위로 예외를 흡수한다. 항목마다 독립된 API 호출이므로 병렬로 처리한다.
     """
-    result = []
-    for spot in spots:
-        content = None
-        try:
-            content = find_visitseoul_content(spot["name"])
-        except requests.RequestException:
-            content = None
-        photo_url = content.get("main_img") if content else None
-        detail_url = DETAIL_URL_TEMPLATE.format(cid=content["cid"]) if content and content.get("cid") else None
-        result.append({**spot, "photo_url": photo_url, "detail_url": detail_url})
-    return result
+    if not spots:
+        return []
+    with ThreadPoolExecutor(max_workers=min(MAX_WORKERS, len(spots))) as executor:
+        return list(executor.map(_attach_photo, spots))
