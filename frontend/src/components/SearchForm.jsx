@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { SEOUL_DISTRICTS, SEOUL_DISTRICT_AREAS, isSeoulRegion } from '../seoulDistricts'
+import { getDistrictLabel, getAreaLabel } from '../seoulDistrictsI18n'
 import { getStrings } from '../i18n'
 import LocationToggle from './LocationToggle'
 
@@ -112,10 +113,10 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
                     setShowRegionList(false)
                   }}
                 >
-                  {r}
+                  {getDistrictLabel(language, r)}
                   <span className="region-suggestion-areas">
                     {' '}
-                    / {SEOUL_DISTRICT_AREAS[r].join(', ')}
+                    / {SEOUL_DISTRICT_AREAS[r].map((area) => getAreaLabel(language, area)).join(', ')}
                   </span>
                 </button>
               </li>
