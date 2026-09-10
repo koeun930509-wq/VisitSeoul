@@ -108,7 +108,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
-                    setRegion(r)
+                    setRegion(`${r}(${SEOUL_DISTRICT_AREAS[r].join(', ')})`)
                     setShowRegionList(false)
                   }}
                 >
