@@ -53,14 +53,39 @@ function RecommendationCard({ region, item, t }) {
 
 function WeatherPicksCarousel({ title, region, items, t }) {
   const scrollRef = useRef(null)
+  const isJumping = useRef(false)
+
+  function getCardStep(el) {
+    const card = el.querySelector('.rec-card-slide')
+    return card ? card.getBoundingClientRect().width + 16 : el.clientWidth * 0.8
+  }
+
+  function handleScroll() {
+    const el = scrollRef.current
+    if (!el || isJumping.current) return
+
+    const cardStep = getCardStep(el)
+    const loopWidth = cardStep * items.length
+    const { scrollLeft } = el
+
+    if (scrollLeft >= loopWidth * 2 - 1) {
+      isJumping.current = true
+      el.scrollLeft = scrollLeft - loopWidth
+      isJumping.current = false
+    } else if (scrollLeft <= 1) {
+      isJumping.current = true
+      el.scrollLeft = scrollLeft + loopWidth
+      isJumping.current = false
+    }
+  }
 
   function scrollByCards(direction) {
     const el = scrollRef.current
     if (!el) return
-    const card = el.querySelector('.rec-card-slide')
-    const cardWidth = card ? card.getBoundingClientRect().width + 16 : el.clientWidth * 0.8
-    el.scrollBy({ left: direction * cardWidth, behavior: 'smooth' })
+    el.scrollBy({ left: direction * getCardStep(el), behavior: 'smooth' })
   }
+
+  const loopedItems = [...items, ...items, ...items]
 
   return (
     <section className="rec-section">
@@ -89,9 +114,21 @@ function WeatherPicksCarousel({ title, region, items, t }) {
           </button>
         </div>
       </div>
-      <div className="carousel-track" ref={scrollRef}>
-        {items.map((item) => (
-          <div className="rec-card-slide" key={item.name}>
+      <div
+        className="carousel-track"
+        ref={(el) => {
+          scrollRef.current = el
+          if (el && !el.dataset.initialized) {
+            el.dataset.initialized = 'true'
+            requestAnimationFrame(() => {
+              el.scrollLeft = getCardStep(el) * items.length
+            })
+          }
+        }}
+        onScroll={handleScroll}
+      >
+        {loopedItems.map((item, index) => (
+          <div className="rec-card-slide" key={`${item.name}-${index}`}>
             <RecommendationCard region={region} item={item} t={t} />
           </div>
         ))}
