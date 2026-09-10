@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { API_BASE } from '../apiBase'
 import { getStrings } from '../i18n'
-import VisitSeoulBadge from './VisitSeoulBadge'
 
 const VISITSEOUL_LANG_CODES = { ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN' }
 
@@ -47,9 +46,6 @@ export default function SeoulEvents({ language = 'ko' }) {
               <img className="rec-card-photo" src={item.main_img} alt={item.post_sj} loading="lazy" />
             )}
             <div className="rec-card-body">
-              <div className="rec-card-badge">
-                <VisitSeoulBadge />
-              </div>
               <h4>{item.post_sj}</h4>
               <p>{item.sumry}</p>
             </div>
