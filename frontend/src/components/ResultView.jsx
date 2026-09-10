@@ -165,6 +165,7 @@ function RecommendationSection({ title, region, items, isPreview, t }) {
 
 export default function ResultView({ result, activeTab, onTabChange, language = 'ko' }) {
   const t = getStrings(language)
+  const [showHourly, setShowHourly] = useState(false)
   const { region, weather, weather_by_day: weatherByDay, hourly_weather: hourlyWeather, recommendation } = result
   const tripDays = weatherByDay && weatherByDay.length > 1 ? weatherByDay : null
   const categoryEntries = Object.entries(recommendation.categories).filter(
@@ -270,19 +271,36 @@ export default function ResultView({ result, activeTab, onTabChange, language = 
 
         {hourlyWeather && hourlyWeather.length > 0 && (
           <div className="hourly-forecast-wrap">
-            <p className="hourly-forecast-title">{t.hourlyForecastTitle}</p>
-            <div className="hourly-forecast">
-              {hourlyWeather.map((hour) => (
-                <div className="hourly-forecast-item" key={hour.time}>
-                  <p className="hourly-forecast-time">{hour.time}</p>
-                  <div className="hourly-forecast-icon">
-                    <WeatherIcon condition={hour.condition} weatherCode={hour.weather_code} />
+            <button
+              type="button"
+              className="hourly-forecast-toggle"
+              onClick={() => setShowHourly((prev) => !prev)}
+              aria-expanded={showHourly}
+            >
+              <span className="hourly-forecast-title">{t.hourlyForecastTitle}</span>
+              <svg
+                className={`hourly-forecast-toggle-icon${showHourly ? ' is-open' : ''}`}
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {showHourly && (
+              <div className="hourly-forecast">
+                {hourlyWeather.map((hour) => (
+                  <div className="hourly-forecast-item" key={hour.time}>
+                    <p className="hourly-forecast-time">{hour.time}</p>
+                    <div className="hourly-forecast-icon">
+                      <WeatherIcon condition={hour.condition} weatherCode={hour.weather_code} />
+                    </div>
+                    <p className="hourly-forecast-temp">{hour.temp}°</p>
+                    <p className="hourly-forecast-pop">{hour.pop}%</p>
                   </div>
-                  <p className="hourly-forecast-temp">{hour.temp}°</p>
-                  <p className="hourly-forecast-pop">{hour.pop}%</p>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </section>

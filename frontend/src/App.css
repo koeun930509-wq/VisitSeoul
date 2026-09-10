@@ -670,11 +670,36 @@
   margin-top: 40px;
 }
 
+.hourly-forecast-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 .hourly-forecast-title {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-h);
-  margin-bottom: 16px;
+}
+
+.hourly-forecast-toggle-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-h);
+  transition: transform 0.2s ease;
+}
+
+.hourly-forecast-toggle-icon.is-open {
+  transform: rotate(180deg);
+}
+
+.hourly-forecast-wrap .hourly-forecast {
+  margin-top: 16px;
 }
 
 .hourly-forecast {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import SearchForm from './components/SearchForm'
 import ResultView from './components/ResultView'
 import Toolbar from './components/Toolbar'
@@ -17,6 +17,7 @@ function App() {
   const [presetRegion, setPresetRegion] = useState('')
   const [activeTab, setActiveTab] = useState(ALL_TAB)
   const t = getStrings(language)
+  const resultRef = useRef(null)
 
   useEffect(() => {
     function handleScroll() {
@@ -25,6 +26,12 @@ function App() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (result && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [result])
 
   async function handleSearch({ region, date, endDate }) {
     setLoading(true)
@@ -67,7 +74,9 @@ function App() {
 
       {error && <p className="error">{error}</p>}
       {result && (
-        <ResultView result={result} activeTab={activeTab} onTabChange={setActiveTab} language={language} />
+        <div ref={resultRef}>
+          <ResultView result={result} activeTab={activeTab} onTabChange={setActiveTab} language={language} />
+        </div>
       )}
 
       {result && activeTab === '축제/공연/행사' && <SeoulEvents language={language} />}
