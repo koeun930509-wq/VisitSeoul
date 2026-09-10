@@ -3,7 +3,6 @@ import { SEOUL_DISTRICTS, SEOUL_DISTRICT_AREAS, isSeoulRegion } from '../seoulDi
 import LocationToggle from './LocationToggle'
 
 const MAX_FORECAST_DAYS = 16
-const MAX_TRIP_NIGHTS = 6
 const INTERESTS = ['문화관광', '쇼핑', '숙박', '역사관광', '음식', '자연관광', '체험관광', '축제/공연/행사']
 
 function toDateInputValue(date) {
@@ -13,16 +12,9 @@ function toDateInputValue(date) {
   return `${y}-${m}-${d}`
 }
 
-function addDays(dateStr, days) {
-  const d = new Date(`${dateStr}T00:00:00`)
-  d.setDate(d.getDate() + days)
-  return toDateInputValue(d)
-}
-
 export default function SearchForm({ onSubmit, loading, presetRegion, interests, onInterestsChange, onLocate }) {
   const [region, setRegion] = useState('')
   const [startDate, setStartDate] = useState('')
-  const [nights, setNights] = useState(0)
   const [showRegionList, setShowRegionList] = useState(false)
   const [regionReadOnly, setRegionReadOnly] = useState(true)
 
@@ -37,14 +29,6 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
     return { min: toDateInputValue(today), max: toDateInputValue(maxDate) }
   }, [])
 
-  const maxNights = useMemo(() => {
-    if (!startDate) return MAX_TRIP_NIGHTS
-    const daysLeft = Math.round((new Date(max) - new Date(startDate)) / 86400000)
-    return Math.max(0, Math.min(MAX_TRIP_NIGHTS, daysLeft))
-  }, [startDate, max])
-
-  const endDate = startDate ? addDays(startDate, nights) : ''
-
   function handleSubmit(e) {
     e?.preventDefault?.()
     if (!region.trim() || !startDate) return
@@ -52,7 +36,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
       window.alert('서울 이외에 지역은 입력되지 않습니다')
       return
     }
-    onSubmit({ region: region.trim(), date: startDate, endDate })
+    onSubmit({ region: region.trim(), date: startDate, endDate: startDate })
   }
 
   function toggleInterest(interest) {
@@ -75,7 +59,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
     <div className="search-form">
       <div className="field region-field">
         <div className="field-label-row">
-          <label htmlFor="region">가고 싶은 지역</label>
+          <label htmlFor="region">어느 동네로 갈까요?</label>
           <LocationToggle onLocate={onLocate} />
         </div>
         <div className="input-arrow-wrap">
@@ -148,7 +132,10 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
       </div>
 
       <div className="field">
-        <label htmlFor="date">출발 날짜</label>
+        <div className="field-label-row">
+          <label htmlFor="date">언제 갈까요?</label>
+          <span className="hint">오늘부터 {MAX_FORECAST_DAYS}일 이내 날짜만 선택 가능</span>
+        </div>
         <div className="input-arrow-wrap">
           <input
             id="date"
@@ -157,48 +144,13 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
             value={startDate}
             min={min}
             max={max}
-            onChange={(e) => {
-              const value = e.target.value
-              setStartDate(value)
-              setNights((prev) => {
-                const daysLeft = Math.round((new Date(max) - new Date(value)) / 86400000)
-                return Math.max(0, Math.min(prev, MAX_TRIP_NIGHTS, daysLeft))
-              })
-            }}
+            onChange={(e) => setStartDate(e.target.value)}
             required
           />
           <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-      </div>
-
-      <div className="field">
-        <div className="field-label-row">
-          <label htmlFor="nights">일정</label>
-          <span className="hint">오늘부터 {MAX_FORECAST_DAYS}일 이내 날짜만 선택 가능</span>
-        </div>
-        <div className="input-arrow-wrap">
-          <select
-            id="nights"
-            value={nights}
-            onChange={(e) => setNights(Number(e.target.value))}
-          >
-            {Array.from({ length: maxNights + 1 }, (_, n) => (
-              <option key={n} value={n}>
-                {n === 0 ? '당일치기' : `${n}박 ${n + 1}일`}
-              </option>
-            ))}
-          </select>
-          <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        {startDate && (
-          <p className="hint hint-right">
-            {startDate} ~ {endDate}
-          </p>
-        )}
       </div>
 
       <div className="field">
