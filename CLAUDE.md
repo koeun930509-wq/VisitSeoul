@@ -13,7 +13,7 @@
 ```
 cd backend
 pip install -r requirements.txt
-cp .env.example .env   # KAKAO_REST_API_KEY, GEMINI_API_KEY 등 채워넣기 (GOOGLE_PLACES_API_KEY는 선택)
+cp .env.example .env   # KAKAO_REST_API_KEY, GEMINI_API_KEY 등 채워넣기
 python app.py          # http://localhost:5000, POST /api/recommend 외 아래 엔드포인트 참고
 ```
 
@@ -47,12 +47,12 @@ npm run dev   # http://localhost:5173, 기본적으로 http://localhost:5000 백
 - **외부 API**:
   - 위경도 변환·역지오코딩: 카카오맵 API (`backend/services/kakao_service.py`)
   - 날씨 조회: Open-Meteo (`backend/services/weather_service.py`, API 키 불필요)
-  - 장소 사진: 비짓서울 API 우선, 실패 시 Google Places API로 폴백 (`backend/services/places_service.py`)
+  - 장소 사진: 비짓서울 API (`backend/services/places_service.py`)
   - 관광 콘텐츠(축제/행사 등): 비짓서울 API (`backend/services/visitseoul_service.py`)
   - 환율: 한국수출입은행 API (`backend/services/exim_service.py`)
   - 명소·맛집 추천 생성: Gemini (`backend/services/gemini_service.py`)
 
-핵심 흐름: 서울 자치구 + 날짜(+ 여행 일정) + 관심사(카테고리, 다중 선택 가능) 입력 → 해당 지역·기간의 날짜별 날씨 조회 → 첫날 날씨와 선택 관심사를 Gemini에 전달해 관심사별로 분리된 추천 생성(각 관심사 카테고리마다 독립된 섹션 제목 + 장소 목록, "음식" 카테고리는 메뉴 정보 포함, 2박 이상이면 카테고리당 6곳·그 외 3곳; 관심사 미선택 시 8개 카테고리 전체) → 각 장소에 비짓서울/Google Places 사진 첨부 → React UI에 관심사별 섹션으로 렌더링. "축제/공연/행사"를 선택하면 비짓서울 API 기반 서울 축제 카드 섹션도 별도로 노출됩니다.
+핵심 흐름: 서울 자치구 + 날짜(+ 여행 일정) + 관심사(카테고리, 다중 선택 가능) 입력 → 해당 지역·기간의 날짜별 날씨 조회 → 첫날 날씨와 선택 관심사를 Gemini에 전달해 관심사별로 분리된 추천 생성(각 관심사 카테고리마다 독립된 섹션 제목 + 장소 목록, "음식" 카테고리는 메뉴 정보 포함, 2박 이상이면 카테고리당 6곳·그 외 3곳; 관심사 미선택 시 8개 카테고리 전체) → 각 장소에 비짓서울 사진 첨부 → React UI에 관심사별 섹션으로 렌더링. "축제/공연/행사"를 선택하면 비짓서울 API 기반 서울 축제 카드 섹션도 별도로 노출됩니다.
 
 관심사(카테고리) 8종: 문화관광, 쇼핑, 숙박, 역사관광, 음식, 자연관광, 체험관광, 축제/공연/행사.
 

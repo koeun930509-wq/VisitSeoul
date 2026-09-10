@@ -28,7 +28,7 @@ def get_travel_recommendation(
     weather_by_day = get_weather_for_period(location["lat"], location["lon"], start_date, end_date)
     recommendation = generate_recommendations(region, weather_by_day[0], spot_count, interests or [], language)
     for category in recommendation["categories"].values():
-        category["items"] = attach_photos(region, category["items"])
+        category["items"] = attach_photos(category["items"])
     return {
         "region": region,
         "location": location,
