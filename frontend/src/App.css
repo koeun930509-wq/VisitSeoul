@@ -782,8 +782,9 @@
 }
 
 .carousel-arrow:hover {
-  color: var(--accent);
-  border-color: var(--accent-border);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border-color: transparent;
 }
 
 .carousel-track {
