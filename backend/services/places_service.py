@@ -3,16 +3,15 @@ from concurrent.futures import ThreadPoolExecutor
 
 import requests
 
+from services.cache import cached
 from services.visitseoul_service import get_contents
 
 DETAIL_URL_TEMPLATE = "https://korean.visitseoul.net/attractions/detail/{cid}"
 MAX_WORKERS = 16
+CONTENT_CACHE_TTL_SECONDS = 6 * 60 * 60  # 장소 사진/상세페이지 정보는 자주 바뀌지 않으므로 6시간 캐시
 
 
-def find_visitseoul_content(name: str) -> dict | None:
-    """장소명(name)으로 비짓서울 콘텐츠를 검색해 첫 번째 결과를 반환한다.
-    검색 결과가 없으면 None을 반환한다.
-    """
+def _fetch_visitseoul_content(name: str) -> dict | None:
     if not os.environ.get("VISIT_SEOUL_API_KEY"):
         return None
 
@@ -25,6 +24,14 @@ def find_visitseoul_content(name: str) -> dict | None:
         return None
 
     return items[0]
+
+
+def find_visitseoul_content(name: str) -> dict | None:
+    """장소명(name)으로 비짓서울 콘텐츠를 검색해 첫 번째 결과를 반환한다.
+    검색 결과가 없으면 None을 반환한다. 같은 장소는 여러 카테고리·언어에서
+    반복 조회되므로 결과를 캐시해 API 호출을 줄인다.
+    """
+    return cached(f"visitseoul_content:{name}", CONTENT_CACHE_TTL_SECONDS, lambda: _fetch_visitseoul_content(name))
 
 
 def _attach_photo(spot: dict) -> dict:

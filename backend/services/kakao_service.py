@@ -2,17 +2,15 @@ import os
 
 import requests
 
+from services.cache import cached
+
 ADDRESS_SEARCH_URL = "https://dapi.kakao.com/v2/local/search/address.json"
 KEYWORD_SEARCH_URL = "https://dapi.kakao.com/v2/local/search/keyword.json"
 COORD2ADDRESS_URL = "https://dapi.kakao.com/v2/local/geo/coord2address.json"
+GEOCODE_CACHE_TTL_SECONDS = 30 * 24 * 60 * 60  # 지역의 위경도는 사실상 변하지 않으므로 30일 캐시
 
 
-def geocode_region(region: str) -> dict:
-    """지역명을 카카오맵 API로 위도/경도로 변환한다.
-
-    주소 검색으로 못 찾으면(예: '제주도', '해운대'처럼 정식 주소가 아닌 지역명)
-    키워드 검색으로 한 번 더 시도한다.
-    """
+def _fetch_geocode(region: str) -> dict:
     api_key = os.environ["KAKAO_REST_API_KEY"]
     headers = {"Authorization": f"KakaoAK {api_key}"}
 
@@ -29,6 +27,15 @@ def geocode_region(region: str) -> dict:
         "lon": float(doc["x"]),
         "matched_name": doc.get("address_name") or doc.get("place_name"),
     }
+
+
+def geocode_region(region: str) -> dict:
+    """지역명을 카카오맵 API로 위도/경도로 변환한다.
+
+    주소 검색으로 못 찾으면(예: '제주도', '해운대'처럼 정식 주소가 아닌 지역명)
+    키워드 검색으로 한 번 더 시도한다. 같은 지역이 반복 검색되는 경우가 많으므로 결과를 캐시한다.
+    """
+    return cached(f"geocode:{region}", GEOCODE_CACHE_TTL_SECONDS, lambda: _fetch_geocode(region))
 
 
 def _search(url: str, headers: dict, query: str) -> list:
