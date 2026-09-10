@@ -678,20 +678,18 @@
 }
 
 .hourly-forecast {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: thin;
 }
 
 .hourly-forecast-item {
-  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
   gap: 4px;
-  min-width: 64px;
+  min-width: 0;
   padding: 14px 8px;
   border-radius: 14px;
   background: var(--surface-strong);
@@ -768,6 +766,11 @@
 }
 
 @media (max-width: 560px) {
+  .hourly-forecast {
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 12px;
+  }
+
   .category-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
