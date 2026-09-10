@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import WeatherIcon from './WeatherIcon'
 import StatIcon from './StatIcon'
 import CategoryIcon from './CategoryIcon'
@@ -48,6 +48,55 @@ function RecommendationCard({ region, item, t }) {
         )}
       </div>
     </article>
+  )
+}
+
+function WeatherPicksCarousel({ title, region, items, t }) {
+  const scrollRef = useRef(null)
+
+  function scrollByCards(direction) {
+    const el = scrollRef.current
+    if (!el) return
+    const card = el.querySelector('.rec-card-slide')
+    const cardWidth = card ? card.getBoundingClientRect().width + 16 : el.clientWidth * 0.8
+    el.scrollBy({ left: direction * cardWidth, behavior: 'smooth' })
+  }
+
+  return (
+    <section className="rec-section">
+      <div className="carousel-heading">
+        <h3>{title}</h3>
+        <div className="carousel-arrows">
+          <button
+            type="button"
+            className="carousel-arrow"
+            onClick={() => scrollByCards(-1)}
+            aria-label={t.prevSlide}
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M12.5 5 7.5 10l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="carousel-arrow"
+            onClick={() => scrollByCards(1)}
+            aria-label={t.nextSlide}
+          >
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M7.5 5 12.5 10l-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="carousel-track" ref={scrollRef}>
+        {items.map((item) => (
+          <div className="rec-card-slide" key={item.name}>
+            <RecommendationCard region={region} item={item} t={t} />
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -202,7 +251,7 @@ export default function ResultView({ result, activeTab, onTabChange, language = 
       </section>
 
       {recommendation.weather_picks && recommendation.weather_picks.length > 0 && (
-        <RecommendationSection
+        <WeatherPicksCarousel
           title={t.weatherPicksTitle}
           region={region}
           items={recommendation.weather_picks}
