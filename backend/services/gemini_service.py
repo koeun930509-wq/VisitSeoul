@@ -36,6 +36,9 @@ _FOOD_ITEM_SCHEMA = {
 }
 
 
+WEATHER_PICKS_COUNT = 6
+
+
 def _build_schema(interests: list[str]) -> dict:
     category_properties = {}
     for interest in interests:
@@ -54,13 +57,14 @@ def _build_schema(interests: list[str]) -> dict:
         "properties": {
             "weather_desc": {"type": "string"},
             "spot_reason": {"type": "string"},
+            "weather_picks": {"type": "array", "items": _SPOT_ITEM_SCHEMA},
             "categories": {
                 "type": "object",
                 "properties": category_properties,
                 "required": interests,
             },
         },
-        "required": ["weather_desc", "spot_reason", "categories"],
+        "required": ["weather_desc", "spot_reason", "weather_picks", "categories"],
     }
 
 
@@ -97,6 +101,7 @@ def _build_prompt(region: str, weather: dict, count: int, interests: list[str], 
 요구사항:
 - weather_desc: 위 날씨 조건을 한 문장으로 요약하세요.
 - spot_reason: 이 날씨에서 어떤 장소들을 추천하는지 한 문장으로 요약하세요 (예: 실내 활동 위주 추천, 야외 활동 위주 추천).
+- weather_picks: 관심사 카테고리 구분 없이, 오늘 날씨에 가장 적합한 장소 {WEATHER_PICKS_COUNT}곳을 추천하세요. 예를 들어 비가 오거나 폭염·한파면 도서관·박물관·실내 카페 등 실내 위주로, 맑고 선선하면 공원·전망대 등 야외 위주로 장소를 고르세요.
 - categories 객체의 각 키(관심사)마다 해당 카테고리에 맞는 장소를 아래 기준으로 추천하세요. 관광 안내 책자에 잘 나오지 않는, 현지인이 즐겨 찾는 장소 위주로 추천하고, 카테고리 간 장소가 겹치지 않게 하세요.
 {category_lines}
 - 각 추천마다 why_this_weather에 위 날씨 조건에서 왜 그 장소가 적합한지 이유를 제시하세요 (예: 비/폭염이면 실내·그늘 위주, 맑고 선선하면 야외 위주).

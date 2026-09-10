@@ -1,6 +1,5 @@
 import json
 import sys
-from datetime import datetime
 
 from dotenv import load_dotenv
 
@@ -8,6 +7,8 @@ from services.gemini_service import generate_recommendations
 from services.kakao_service import geocode_region
 from services.places_service import attach_photos
 from services.weather_service import get_weather_for_period
+
+CATEGORY_SPOT_COUNT = 9
 
 
 def get_travel_recommendation(
@@ -21,14 +22,21 @@ def get_travel_recommendation(
     날씨와 추천을 반환한다. 추천은 첫날 날씨를 기준으로 생성한다.
     """
     end_date = end_date or start_date
-    nights = (datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")).days
-    spot_count = 6 if nights >= 2 else 3
 
     location = geocode_region(region)
-    weather_by_day = get_weather_for_period(location["lat"], location["lon"], start_date, end_date)
-    recommendation = generate_recommendations(region, weather_by_day[0], spot_count, interests or [], language)
+    weather_by_day_ko = get_weather_for_period(location["lat"], location["lon"], start_date, end_date)
+    recommendation = generate_recommendations(
+        region, weather_by_day_ko[0], CATEGORY_SPOT_COUNT, interests or [], language
+    )
+    recommendation["weather_picks"] = attach_photos(recommendation["weather_picks"])
     for category in recommendation["categories"].values():
         category["items"] = attach_photos(category["items"])
+
+    weather_by_day = (
+        weather_by_day_ko
+        if language == "ko"
+        else get_weather_for_period(location["lat"], location["lon"], start_date, end_date, language)
+    )
     return {
         "region": region,
         "location": location,

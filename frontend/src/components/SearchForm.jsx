@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { SEOUL_DISTRICTS, SEOUL_DISTRICT_AREAS, isSeoulRegion } from '../seoulDistricts'
+import { getStrings } from '../i18n'
 import LocationToggle from './LocationToggle'
 
 const MAX_FORECAST_DAYS = 16
@@ -11,7 +12,8 @@ function toDateInputValue(date) {
   return `${y}-${m}-${d}`
 }
 
-export default function SearchForm({ onSubmit, loading, presetRegion, onLocate }) {
+export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, language = 'ko' }) {
+  const t = getStrings(language)
   const [region, setRegion] = useState('')
   const [startDate, setStartDate] = useState('')
   const [showRegionList, setShowRegionList] = useState(false)
@@ -32,7 +34,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate }
     e?.preventDefault?.()
     if (!region.trim() || !startDate) return
     if (!isSeoulRegion(region)) {
-      window.alert('서울 이외에 지역은 입력되지 않습니다')
+      window.alert(t.seoulOnlyAlert)
       return
     }
     onSubmit({ region: region.trim(), date: startDate, endDate: startDate })
@@ -50,8 +52,8 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate }
     <div className="search-form">
       <div className="field region-field">
         <div className="field-label-row">
-          <label htmlFor="region">어느 동네로 갈까요?</label>
-          <LocationToggle onLocate={onLocate} />
+          <label htmlFor="region">{t.regionLabel}</label>
+          <LocationToggle onLocate={onLocate} language={language} />
         </div>
         <div className="input-arrow-wrap">
           <input
@@ -79,7 +81,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate }
               setTimeout(() => setShowRegionList(false), 100)
             }}
             onKeyDown={handleRegionKeyDown}
-            placeholder="예: 강남구, 마포구"
+            placeholder={t.regionPlaceholder}
             required
           />
           <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -97,7 +99,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate }
                   setShowRegionList(false)
                 }}
               >
-                전체
+                {t.regionAllOption}
               </button>
             </li>
             {SEOUL_DISTRICTS.map((r) => (
@@ -124,8 +126,8 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate }
 
       <div className="field">
         <div className="field-label-row">
-          <label htmlFor="date">언제 갈까요?</label>
-          <span className="hint">오늘부터 {MAX_FORECAST_DAYS}일 이내 날짜만 선택 가능</span>
+          <label htmlFor="date">{t.dateLabel}</label>
+          <span className="hint">{t.dateHint(MAX_FORECAST_DAYS)}</span>
         </div>
         <div className="input-arrow-wrap">
           <input
@@ -145,7 +147,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate }
       </div>
 
       <button type="button" disabled={loading} onClick={handleSubmit}>
-        {loading ? '추천 찾는 중…' : '추천 받기'}
+        {loading ? t.submitLoading : t.submitIdle}
       </button>
     </div>
   )

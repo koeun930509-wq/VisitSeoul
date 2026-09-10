@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { API_BASE } from '../apiBase'
 import { isSeoulRegion } from '../seoulDistricts'
+import { getStrings } from '../i18n'
 
-async function reverseGeocode(latitude, longitude) {
+async function reverseGeocode(latitude, longitude, fallbackError) {
   const res = await fetch(`${API_BASE}/api/reverse-geocode?lat=${latitude}&lon=${longitude}`)
   const data = await res.json()
-  if (!res.ok) throw new Error(data.error || '주소를 불러오지 못했습니다.')
+  if (!res.ok) throw new Error(data.error || fallbackError)
   return data.address
 }
 
-export default function LocationToggle({ onLocate }) {
+export default function LocationToggle({ onLocate, language = 'ko' }) {
+  const t = getStrings(language)
   const [active, setActive] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -22,7 +24,7 @@ export default function LocationToggle({ onLocate }) {
     }
 
     if (!navigator.geolocation) {
-      setError('위치 정보를 사용할 수 없어요.')
+      setError(t.locationUnsupported)
       return
     }
 
@@ -32,9 +34,9 @@ export default function LocationToggle({ onLocate }) {
       async (position) => {
         const { latitude, longitude } = position.coords
         try {
-          const place = await reverseGeocode(latitude, longitude)
+          const place = await reverseGeocode(latitude, longitude, t.locationAddressError)
           if (!isSeoulRegion(place)) {
-            window.alert('서울 이외에 지역은 입력되지 않습니다')
+            window.alert(t.seoulOnlyAlert)
             return
           }
           onLocate?.(place)
@@ -46,7 +48,7 @@ export default function LocationToggle({ onLocate }) {
         }
       },
       () => {
-        setError('위치 권한을 허용해주세요.')
+        setError(t.locationPermissionDenied)
         setLoading(false)
       },
       { enableHighAccuracy: false, timeout: 8000 }
@@ -72,7 +74,7 @@ export default function LocationToggle({ onLocate }) {
             strokeLinecap="round"
           />
         </svg>
-        {loading ? '위치 확인 중…' : '현위치'}
+        {loading ? t.locationLoading : t.locationLabel}
       </button>
       {error && <p className="location-error">{error}</p>}
     </div>

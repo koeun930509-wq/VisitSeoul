@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react'
 import { API_BASE } from '../apiBase'
+import { getStrings } from '../i18n'
 import VisitSeoulBadge from './VisitSeoulBadge'
 
 const VISITSEOUL_LANG_CODES = { ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN' }
 
-const TITLES = {
-  ko: '지금 서울의 축제·행사',
-  en: "Seoul's Festivals & Events",
-  ja: 'ソウルの祭り・イベント',
-  zh: '首尔的节庆活动',
-}
-
 export default function SeoulEvents({ language = 'ko' }) {
+  const t = getStrings(language)
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -25,7 +20,7 @@ export default function SeoulEvents({ language = 'ko' }) {
         const langCode = VISITSEOUL_LANG_CODES[language] || 'ko'
         const res = await fetch(`${API_BASE}/api/seoul-contents?keyword=축제&lang=${langCode}`)
         const data = await res.json()
-        if (!res.ok) throw new Error(data.error || '행사 정보를 불러오지 못했습니다.')
+        if (!res.ok) throw new Error(data.error || t.festivalsFetchError)
         if (!cancelled) setItems(data.data || [])
       } catch (err) {
         if (!cancelled) setError(err.message)
@@ -44,7 +39,7 @@ export default function SeoulEvents({ language = 'ko' }) {
 
   return (
     <section className="rec-section seoul-events">
-      <h3>{TITLES[language] || TITLES.ko}</h3>
+      <h3>{t.festivalsTitle}</h3>
       <div className="card-grid">
         {items.slice(0, 10).map((item) => (
           <article className="rec-card" key={item.cid}>
@@ -59,7 +54,7 @@ export default function SeoulEvents({ language = 'ko' }) {
               <p>{item.sumry}</p>
             </div>
             <a className="map-link" href="https://visitseoul.net" target="_blank" rel="noreferrer">
-              자세히 보기 ↗
+              {t.festivalMoreLink}
             </a>
           </article>
         ))}

@@ -749,6 +749,25 @@
   }
 }
 
+.load-more-btn {
+  display: block;
+  margin: 16px auto 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border: 1px solid #d9dced;
+  border-radius: 999px;
+  background: var(--surface-strong);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.load-more-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
 @media (max-width: 560px) {
   .category-tabs {
     flex-wrap: nowrap;
@@ -904,10 +923,15 @@
   line-height: 130%;
 }
 
-.map-link {
+.rec-card-links {
   align-self: flex-end;
-  display: inline-block;
+  display: flex;
+  gap: 8px;
   margin-top: 12px;
+}
+
+.map-link {
+  display: inline-block;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-h);

@@ -5,6 +5,7 @@ import Toolbar from './components/Toolbar'
 import SeoulEvents from './components/SeoulEvents'
 import { API_BASE } from './apiBase'
 import { ALL_TAB } from './categories'
+import { getStrings } from './i18n'
 import './App.css'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
   const [language, setLanguage] = useState('ko')
   const [presetRegion, setPresetRegion] = useState('')
   const [activeTab, setActiveTab] = useState(ALL_TAB)
+  const t = getStrings(language)
 
   useEffect(() => {
     function handleScroll() {
@@ -36,7 +38,7 @@ function App() {
         body: JSON.stringify({ region, date, endDate, language }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || '추천을 불러오지 못했습니다.')
+      if (!res.ok) throw new Error(data.error || t.fetchError)
       setResult(data)
     } catch (err) {
       setError(err.message)
@@ -48,8 +50,8 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>VividSoul</h1>
-        <p>지역과 날짜를 선택하면 날씨에 맞는 숨은 명소·맛집을 추천해드려요.</p>
+        <h1>{t.appTitle}</h1>
+        <p>{t.appSubtitle}</p>
       </header>
 
       <div className="search-section">
@@ -59,16 +61,19 @@ function App() {
           loading={loading}
           presetRegion={presetRegion}
           onLocate={setPresetRegion}
+          language={language}
         />
       </div>
 
       {error && <p className="error">{error}</p>}
-      {result && <ResultView result={result} activeTab={activeTab} onTabChange={setActiveTab} />}
+      {result && (
+        <ResultView result={result} activeTab={activeTab} onTabChange={setActiveTab} language={language} />
+      )}
 
       {result && activeTab === '축제/공연/행사' && <SeoulEvents language={language} />}
 
       <footer className="app-footer">
-        <p>Copyright(c) VividSoul. All rights reserved.</p>
+        <p>{t.footer}</p>
       </footer>
 
       {showTopBtn && (
@@ -76,7 +81,7 @@ function App() {
           type="button"
           className="scroll-top-btn"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          aria-label="맨 위로 이동"
+          aria-label={t.scrollTop}
         >
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path d="M5 12 10 7 15 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

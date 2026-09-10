@@ -1,23 +1,84 @@
+import { useState } from 'react'
 import WeatherIcon from './WeatherIcon'
 import StatIcon from './StatIcon'
 import CategoryIcon from './CategoryIcon'
 import aiSparkleIcon from '../assets/ai-sparkle.png'
 import { CATEGORIES, ALL_TAB } from '../categories'
+import { getStrings, getCategoryLabel, getWeekdays } from '../i18n'
 
-const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
 const TABS = [ALL_TAB, ...CATEGORIES]
+const PREVIEW_SIZE = 3
+const PAGE_SIZE = 6
 
 function googleMapSearchUrl(region, name) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${region} ${name}`)}`
 }
 
-function formatDateWithWeekday(dateStr) {
+function formatDateWithWeekday(dateStr, language) {
   const d = new Date(`${dateStr}T00:00:00`)
   const formatted = dateStr.replace(/-/g, '.')
-  return `${formatted} (${WEEKDAYS[d.getDay()]})`
+  return `${formatted} (${getWeekdays(language)[d.getDay()]})`
 }
 
-export default function ResultView({ result, activeTab, onTabChange }) {
+function RecommendationCard({ region, item, t }) {
+  return (
+    <article className="rec-card">
+      {item.photo_url && (
+        <img className="rec-card-photo" src={item.photo_url} alt={item.name} loading="lazy" />
+      )}
+      <div className="rec-card-body">
+        <h4>{item.name}</h4>
+        <p>{item.menu || item.description}</p>
+        <p className="why">{item.why_this_weather}</p>
+      </div>
+      <div className="rec-card-links">
+        {item.detail_url ? (
+          <a className="map-link" href={item.detail_url} target="_blank" rel="noreferrer">
+            {t.detailLink}
+          </a>
+        ) : (
+          <a
+            className="map-link"
+            href={googleMapSearchUrl(region, item.name)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t.mapLink}
+          </a>
+        )}
+      </div>
+    </article>
+  )
+}
+
+function RecommendationSection({ title, region, items, isPreview, t }) {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const visibleItems = isPreview ? items.slice(0, PREVIEW_SIZE) : items.slice(0, visibleCount)
+  const hasMore = !isPreview && visibleCount < items.length
+
+  return (
+    <section className="rec-section">
+      <h3>{title}</h3>
+      <div className="card-grid">
+        {visibleItems.map((item) => (
+          <RecommendationCard key={item.name} region={region} item={item} t={t} />
+        ))}
+      </div>
+      {hasMore && (
+        <button
+          type="button"
+          className="load-more-btn"
+          onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+        >
+          {t.loadMore}
+        </button>
+      )}
+    </section>
+  )
+}
+
+export default function ResultView({ result, activeTab, onTabChange, language = 'ko' }) {
+  const t = getStrings(language)
   const { region, weather, weather_by_day: weatherByDay, recommendation } = result
   const tripDays = weatherByDay && weatherByDay.length > 1 ? weatherByDay : null
   const categoryEntries = Object.entries(recommendation.categories).filter(
@@ -33,8 +94,8 @@ export default function ResultView({ result, activeTab, onTabChange }) {
           </svg>
           <span className="weather-region">{region}</span>
           <span className="weather-daterange">
-            {formatDateWithWeekday(weather.date)}
-            {tripDays ? ` ~ ${formatDateWithWeekday(tripDays[tripDays.length - 1].date)}` : ''}
+            {formatDateWithWeekday(weather.date, language)}
+            {tripDays ? ` ~ ${formatDateWithWeekday(tripDays[tripDays.length - 1].date, language)}` : ''}
           </span>
         </div>
 
@@ -54,14 +115,14 @@ export default function ResultView({ result, activeTab, onTabChange }) {
           <div className="weather-stats">
             <div className="weather-stat">
               <span className="weather-stat-label">
-                <StatIcon type="umbrella" className="weather-stat-icon" /> 강수확률
+                <StatIcon type="umbrella" className="weather-stat-icon" /> {t.precipitation}
               </span>
               <span className="weather-stat-value">{weather.pop}%</span>
             </div>
             {weather.windspeed != null && (
               <div className="weather-stat">
                 <span className="weather-stat-label">
-                  <StatIcon type="wind" className="weather-stat-icon" /> 풍속
+                  <StatIcon type="wind" className="weather-stat-icon" /> {t.windspeed}
                 </span>
                 <span className="weather-stat-value">{weather.windspeed}m/s</span>
               </div>
@@ -69,7 +130,7 @@ export default function ResultView({ result, activeTab, onTabChange }) {
             {weather.humidity != null && (
               <div className="weather-stat">
                 <span className="weather-stat-label">
-                  <StatIcon type="drop" className="weather-stat-icon" /> 습도
+                  <StatIcon type="drop" className="weather-stat-icon" /> {t.humidity}
                 </span>
                 <span className="weather-stat-value">{weather.humidity}%</span>
               </div>
@@ -77,7 +138,7 @@ export default function ResultView({ result, activeTab, onTabChange }) {
             {weather.travel_index && (
               <div className="weather-stat">
                 <span className="weather-stat-label">
-                  <StatIcon type="smile" className="weather-stat-icon" /> 여행지수
+                  <StatIcon type="smile" className="weather-stat-icon" /> {t.travelIndex}
                 </span>
                 <span className="weather-stat-value">{weather.travel_index}</span>
               </div>
@@ -112,15 +173,24 @@ export default function ResultView({ result, activeTab, onTabChange }) {
                     <span className="daily-forecast-temp-range">
                       {day.temp_min}° ~ {day.temp_max}°C
                     </span>
-                    <span className="daily-forecast-temp-pop">강수확률 {day.pop}%</span>
+                    <span className="daily-forecast-temp-pop">{t.precipitation} {day.pop}%</span>
                   </p>
                 </div>
               ))}
             </div>
-            <p className="hint">아래 추천은 첫째 날({weather.date}) 날씨를 기준으로 생성됐어요.</p>
+            <p className="hint">{t.weatherForecastNote(weather.date)}</p>
           </>
         )}
       </section>
+
+      {recommendation.weather_picks && recommendation.weather_picks.length > 0 && (
+        <RecommendationSection
+          title={t.weatherPicksTitle}
+          region={region}
+          items={recommendation.weather_picks}
+          t={t}
+        />
+      )}
 
       <div className="category-tabs">
         {TABS.map((tab) => (
@@ -132,37 +202,20 @@ export default function ResultView({ result, activeTab, onTabChange }) {
             aria-pressed={activeTab === tab}
           >
             <CategoryIcon category={tab} className="category-tab-icon" />
-            {tab}
+            {getCategoryLabel(language, tab)}
           </button>
         ))}
       </div>
 
       {categoryEntries.map(([category, { section_title: sectionTitle, items }]) => (
-        <section className="rec-section" key={category}>
-          <h3>{sectionTitle || category}</h3>
-          <div className="card-grid">
-            {items.map((item) => (
-              <article className="rec-card" key={item.name}>
-                {item.photo_url && (
-                  <img className="rec-card-photo" src={item.photo_url} alt={item.name} loading="lazy" />
-                )}
-                <div className="rec-card-body">
-                  <h4>{item.name}</h4>
-                  <p>{item.menu || item.description}</p>
-                  <p className="why">{item.why_this_weather}</p>
-                </div>
-                <a
-                  className="map-link"
-                  href={googleMapSearchUrl(region, item.name)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  지도에서 보기 ↗
-                </a>
-              </article>
-            ))}
-          </div>
-        </section>
+        <RecommendationSection
+          key={category}
+          title={sectionTitle || getCategoryLabel(language, category)}
+          region={region}
+          items={items}
+          isPreview={activeTab === ALL_TAB}
+          t={t}
+        />
       ))}
     </div>
   )
