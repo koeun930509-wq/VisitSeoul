@@ -242,8 +242,14 @@
   gap: 8px;
 }
 
+.field-label-row label {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .field-label-row .hint {
   margin: 0;
+  text-align: right;
 }
 
 .field input,
@@ -532,6 +538,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
+  flex: 1 1 480px;
 }
 
 .weather-stat {

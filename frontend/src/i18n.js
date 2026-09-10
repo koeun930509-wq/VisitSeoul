@@ -107,7 +107,7 @@ const STRINGS = {
     regionPlaceholder: 'e.g. Gangnam-gu, Mapo-gu',
     regionAllOption: 'All',
     dateLabel: 'When are you going?',
-    dateHint: (days) => `Only dates within the next ${days} days can be selected`,
+    dateHint: (days) => `Only dates within the\nnext ${days} days can be selected`,
     submitIdle: 'Get recommendations',
     submitLoading: 'Finding recommendations…',
     seoulOnlyAlert: 'Only areas within Seoul can be entered',

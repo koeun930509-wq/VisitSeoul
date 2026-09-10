@@ -128,7 +128,14 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
       <div className="field">
         <div className="field-label-row">
           <label htmlFor="date">{t.dateLabel}</label>
-          <span className="hint">{t.dateHint(MAX_FORECAST_DAYS)}</span>
+          <span className="hint">
+            {t.dateHint(MAX_FORECAST_DAYS).split('\n').map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br />}
+                {line}
+              </span>
+            ))}
+          </span>
         </div>
         <div className="input-arrow-wrap">
           <input
