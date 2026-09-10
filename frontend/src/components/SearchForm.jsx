@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { SEOUL_DISTRICTS, isSeoulRegion } from '../seoulDistricts'
+import { SEOUL_DISTRICTS, SEOUL_DISTRICT_AREAS, isSeoulRegion } from '../seoulDistricts'
 import LocationToggle from './LocationToggle'
 
 const MAX_FORECAST_DAYS = 16
@@ -113,6 +113,18 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
         </div>
         {showRegionList && (
           <ul className="region-suggestions">
+            <li>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setRegion('서울')
+                  setShowRegionList(false)
+                }}
+              >
+                전체
+              </button>
+            </li>
             {SEOUL_DISTRICTS.map((r) => (
               <li key={r}>
                 <button
@@ -124,6 +136,10 @@ export default function SearchForm({ onSubmit, loading, presetRegion, interests,
                   }}
                 >
                   {r}
+                  <span className="region-suggestion-areas">
+                    {' '}
+                    / {SEOUL_DISTRICT_AREAS[r].join(', ')}
+                  </span>
                 </button>
               </li>
             ))}

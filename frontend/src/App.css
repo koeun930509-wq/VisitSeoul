@@ -359,6 +359,11 @@
   cursor: pointer;
 }
 
+.region-suggestion-areas {
+  font-size: 13px;
+  color: var(--text);
+}
+
 .interest-grid {
   display: flex;
   flex-wrap: wrap;
