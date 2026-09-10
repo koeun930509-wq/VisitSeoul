@@ -1,13 +1,14 @@
 import WeatherIcon from './WeatherIcon'
 import StatIcon from './StatIcon'
+import CategoryIcon from './CategoryIcon'
 import aiSparkleIcon from '../assets/ai-sparkle.png'
 import { CATEGORIES, ALL_TAB } from '../categories'
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
 const TABS = [ALL_TAB, ...CATEGORIES]
 
-function kakaoMapSearchUrl(region, name) {
-  return `https://map.kakao.com/link/search/${encodeURIComponent(`${region} ${name}`)}`
+function googleMapSearchUrl(region, name) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${region} ${name}`)}`
 }
 
 function formatDateWithWeekday(dateStr) {
@@ -130,6 +131,7 @@ export default function ResultView({ result, activeTab, onTabChange }) {
             onClick={() => onTabChange(tab)}
             aria-pressed={activeTab === tab}
           >
+            <CategoryIcon category={tab} className="category-tab-icon" />
             {tab}
           </button>
         ))}
@@ -151,7 +153,7 @@ export default function ResultView({ result, activeTab, onTabChange }) {
                 </div>
                 <a
                   className="map-link"
-                  href={kakaoMapSearchUrl(region, item.name)}
+                  href={googleMapSearchUrl(region, item.name)}
                   target="_blank"
                   rel="noreferrer"
                 >
