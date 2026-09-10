@@ -54,14 +54,16 @@ export default function SeoulEvents({ language = 'ko' }) {
               <h4>{item.post_sj}</h4>
               <p>{item.sumry}</p>
             </div>
-            <a
-              className="map-link"
-              href={festivalDetailUrl(item.cid)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {t.festivalMoreLink}
-            </a>
+            <div className="rec-card-links">
+              <a
+                className="map-link"
+                href={festivalDetailUrl(item.cid)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t.festivalMoreLink}
+              </a>
+            </div>
           </article>
         ))}
       </div>
