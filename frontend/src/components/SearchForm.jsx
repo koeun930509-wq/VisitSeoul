@@ -17,8 +17,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
   const t = getStrings(language)
   const [region, setRegion] = useState('')
   const [startDate, setStartDate] = useState('')
-  const [showRegionList, setShowRegionList] = useState(false)
-  const [regionReadOnly, setRegionReadOnly] = useState(true)
+  const [showRegionSheet, setShowRegionSheet] = useState(false)
 
   useEffect(() => {
     if (presetRegion) setRegion(presetRegion)
@@ -41,12 +40,8 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
     onSubmit({ region: region.trim(), date: startDate, endDate: startDate })
   }
 
-  function handleRegionKeyDown(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      setShowRegionList(false)
-      document.getElementById('date')?.focus()
-    }
+  function isRegionSelected(r) {
+    return region === '서울' ? false : region.startsWith(r)
   }
 
   return (
@@ -60,71 +55,75 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
           <input
             id="region"
             name="trip-region"
-            type="search"
+            type="text"
             autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck="false"
-            data-lpignore="true"
-            data-1p-ignore="true"
-            data-bwignore="true"
-            readOnly={regionReadOnly}
+            readOnly
             value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            onMouseDown={() => setRegionReadOnly(false)}
-            onFocus={(e) => {
-              setRegionReadOnly(false)
-              setShowRegionList(true)
-              e.target.readOnly = false
-              e.target.scrollIntoView({ block: 'start', behavior: 'smooth' })
-            }}
-            onBlur={() => {
-              setRegionReadOnly(true)
-              setTimeout(() => setShowRegionList(false), 100)
-            }}
-            onKeyDown={handleRegionKeyDown}
+            onClick={() => setShowRegionSheet(true)}
             placeholder={t.regionPlaceholder}
             required
           />
-          <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <button
+            type="button"
+            className="field-arrow-btn"
+            aria-label={t.regionLabel}
+            onClick={() => setShowRegionSheet(true)}
+          >
+            <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
-        {showRegionList && (
-          <ul className="region-suggestions">
-            <li>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  setRegion('서울')
-                  setShowRegionList(false)
-                }}
-              >
-                {t.regionAllOption}
+      </div>
+
+      {showRegionSheet && (
+        <div className="region-sheet-overlay" onClick={() => setShowRegionSheet(false)}>
+          <div className="region-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="region-sheet-header">
+              <span>{t.regionSheetTitle}</span>
+              <button type="button" className="region-sheet-close" onClick={() => setShowRegionSheet(false)}>
+                {t.regionSheetClose}
               </button>
-            </li>
-            {SEOUL_DISTRICTS.map((r) => (
-              <li key={r}>
+            </div>
+            <ul className="region-sheet-list">
+              <li>
                 <button
                   type="button"
-                  onMouseDown={(e) => e.preventDefault()}
+                  className="region-sheet-option"
                   onClick={() => {
-                    setRegion(`${r}(${SEOUL_DISTRICT_AREAS[r].join(', ')})`)
-                    setShowRegionList(false)
+                    setRegion('서울')
+                    setShowRegionSheet(false)
                   }}
                 >
-                  {getDistrictLabel(language, r)}
-                  <span className="region-suggestion-areas">
-                    {' '}
-                    / {SEOUL_DISTRICT_AREAS[r].map((area) => getAreaLabel(language, area)).join(', ')}
-                  </span>
+                  <span className={`region-radio${region === '서울' ? ' checked' : ''}`} aria-hidden="true" />
+                  {t.regionAllOption}
                 </button>
               </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              {SEOUL_DISTRICTS.map((r) => (
+                <li key={r}>
+                  <button
+                    type="button"
+                    className="region-sheet-option"
+                    onClick={() => {
+                      setRegion(`${r}(${SEOUL_DISTRICT_AREAS[r].join(', ')})`)
+                      setShowRegionSheet(false)
+                    }}
+                  >
+                    <span className={`region-radio${isRegionSelected(r) ? ' checked' : ''}`} aria-hidden="true" />
+                    <span>
+                      {getDistrictLabel(language, r)}
+                      <span className="region-suggestion-areas">
+                        {' '}
+                        / {SEOUL_DISTRICT_AREAS[r].map((area) => getAreaLabel(language, area)).join(', ')}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       <div className="field">
         <div className="field-label-row">
