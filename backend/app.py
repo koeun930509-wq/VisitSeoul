@@ -8,7 +8,7 @@ from flask_cors import CORS
 from pipeline import get_travel_recommendation
 from services.exim_service import get_exchange_rates
 from services.kakao_service import reverse_geocode
-from services.visitseoul_service import get_contents, get_festival_contents
+from services.visitseoul_service import CATEGORY_IDS, get_category_contents, get_contents
 
 app = Flask(__name__)
 CORS(app)
@@ -52,8 +52,8 @@ def seoul_contents_endpoint():
         page_no = 1
 
     try:
-        if keyword == "축제":
-            result = get_festival_contents(lang_code_id=lang_code_id, page_no=page_no)
+        if keyword in CATEGORY_IDS:
+            result = get_category_contents(keyword, lang_code_id=lang_code_id, page_no=page_no)
         else:
             result = get_contents(keyword=keyword, lang_code_id=lang_code_id, page_no=page_no)
         return jsonify(result)

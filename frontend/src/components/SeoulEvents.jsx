@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react'
 import { API_BASE } from '../apiBase'
-import { getStrings } from '../i18n'
 
 const VISITSEOUL_LANG_CODES = { ko: 'ko', en: 'en', ja: 'ja', zh: 'zh-CN' }
 const DETAIL_URL_TEMPLATE = 'https://korean.visitseoul.net/attractions/detail/{cid}'
 
-function festivalDetailUrl(cid) {
+function detailUrl(cid) {
   return DETAIL_URL_TEMPLATE.replace('{cid}', cid)
 }
 
-export default function SeoulEvents({ language = 'ko' }) {
-  const t = getStrings(language)
+export default function SeoulEvents({ language = 'ko', keyword, title, moreLink, fetchError }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -22,9 +20,9 @@ export default function SeoulEvents({ language = 'ko' }) {
     async function load() {
       try {
         const langCode = VISITSEOUL_LANG_CODES[language] || 'ko'
-        const res = await fetch(`${API_BASE}/api/seoul-contents?keyword=축제&lang=${langCode}`)
+        const res = await fetch(`${API_BASE}/api/seoul-contents?keyword=${keyword}&lang=${langCode}`)
         const data = await res.json()
-        if (!res.ok) throw new Error(data.error || t.festivalsFetchError)
+        if (!res.ok) throw new Error(data.error || fetchError)
         if (!cancelled) setItems(data.data || [])
       } catch (err) {
         if (!cancelled) setError(err.message)
@@ -37,13 +35,13 @@ export default function SeoulEvents({ language = 'ko' }) {
     return () => {
       cancelled = true
     }
-  }, [language])
+  }, [language, keyword, fetchError])
 
   if (loading || error || items.length === 0) return null
 
   return (
     <section className="rec-section seoul-events">
-      <h3>{t.festivalsTitle}</h3>
+      <h3>{title}</h3>
       <div className="card-grid">
         {items.slice(0, 10).map((item) => (
           <article className="rec-card" key={item.cid}>
@@ -55,13 +53,8 @@ export default function SeoulEvents({ language = 'ko' }) {
               <p>{item.sumry}</p>
             </div>
             <div className="rec-card-links">
-              <a
-                className="map-link"
-                href={festivalDetailUrl(item.cid)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {t.festivalMoreLink}
+              <a className="map-link" href={detailUrl(item.cid)} target="_blank" rel="noreferrer">
+                {moreLink}
               </a>
             </div>
           </article>
