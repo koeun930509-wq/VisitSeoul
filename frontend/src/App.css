@@ -412,6 +412,42 @@
   padding: 0;
 }
 
+.region-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.region-suggestions li {
+  margin: 0;
+  padding: 0;
+}
+
+.region-suggestions li button {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  padding: 8px 15px;
+  border: none;
+  outline: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: #fff;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
 .region-suggestion-areas {
   font-size: 13px;
   color: var(--text);
