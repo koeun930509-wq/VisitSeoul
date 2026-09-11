@@ -76,6 +76,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
               setRegionReadOnly(false)
               setShowRegionList(true)
               e.target.readOnly = false
+              e.target.scrollIntoView({ block: 'start', behavior: 'smooth' })
             }}
             onBlur={() => {
               setRegionReadOnly(true)
