@@ -14,6 +14,12 @@ function googleMapSearchUrl(region, name) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${region} ${name}`)}`
 }
 
+function splitRegionLabel(region) {
+  const match = region.match(/^(.+?)(\(.+\))$/)
+  if (!match) return { main: region, detail: '' }
+  return { main: match[1], detail: match[2] }
+}
+
 function formatDateWithWeekday(dateStr, language) {
   const d = new Date(`${dateStr}T00:00:00`)
   const formatted = dateStr.replace(/-/g, '.')
@@ -171,6 +177,7 @@ export default function ResultView({ result, activeTab, onTabChange, language = 
   const categoryEntries = Object.entries(recommendation.categories).filter(
     ([category]) => activeTab === ALL_TAB || category === activeTab
   )
+  const { main: regionMain, detail: regionDetail } = splitRegionLabel(region)
 
   return (
     <div className="result">
@@ -179,7 +186,10 @@ export default function ResultView({ result, activeTab, onTabChange, language = 
           <svg className="weather-pin" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 2C7.86 2 4.5 5.36 4.5 9.5c0 5.25 6.32 11.5 7.02 12.2a.68.68 0 0 0 .96 0c.7-.7 7.02-6.95 7.02-12.2C19.5 5.36 16.14 2 12 2Zm0 10.25a2.75 2.75 0 1 1 0-5.5 2.75 2.75 0 0 1 0 5.5Z" />
           </svg>
-          <span className="weather-region">{region}</span>
+          <span className="weather-region">
+            {regionMain}
+            {regionDetail && <span className="weather-region-detail">{regionDetail}</span>}
+          </span>
           <span className="weather-daterange">
             {formatDateWithWeekday(weather.date, language)}
             {tripDays ? ` ~ ${formatDateWithWeekday(tripDays[tripDays.length - 1].date, language)}` : ''}

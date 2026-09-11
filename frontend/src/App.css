@@ -490,6 +490,10 @@
   color: var(--text-h);
 }
 
+.weather-region-detail {
+  font-weight: 400;
+}
+
 .weather-daterange {
   font-size: 18px;
   color: var(--text);
@@ -674,7 +678,7 @@
 }
 
 .hourly-forecast-wrap {
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 .hourly-forecast-toggle {
@@ -896,11 +900,16 @@
   }
 
   .weather-heading {
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .weather-pin {
+    width: 22px;
+    height: 22px;
   }
 
   .weather-region {
-    font-size: 26px;
+    font-size: 20px;
   }
 
   .weather-daterange {
@@ -908,8 +917,8 @@
   }
 
   .weather-top {
-    margin-top: 32px;
-    gap: 24px;
+    margin-top: 16px;
+    gap: 20px;
   }
 
   .weather-main {
@@ -960,31 +969,32 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     width: 100%;
+    gap: 8px;
   }
 
   .weather-stat-icon {
-    width: 30px;
-    height: 30px;
+    width: 18px;
+    height: 18px;
   }
 
   .weather-stat {
     min-width: 0;
     align-items: center;
     text-align: center;
-    padding-top: 28px;
-    padding-bottom: 28px;
+    gap: 4px;
+    padding: 10px 12px;
   }
 
   .weather-stat-label {
     align-self: flex-start;
     text-align: left;
-    font-size: 18px;
+    font-size: 13px;
   }
 
   .weather-stat-value {
-    padding: 0 0 0 6px;
+    padding: 0 0 0 4px;
     align-self: flex-start;
-    font-size: 24px;
+    font-size: 17px;
     text-align: left;
   }
 }
