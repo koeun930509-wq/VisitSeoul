@@ -19,9 +19,16 @@
 .app-footer {
   margin-top: auto;
   padding-top: 24px;
+  padding-bottom: 24px;
   text-align: center;
   font-size: 13px;
   color: var(--text);
+}
+
+@media (max-width: 560px) {
+  .app-footer {
+    padding-bottom: 90px;
+  }
 }
 
 .scroll-top-btn {
