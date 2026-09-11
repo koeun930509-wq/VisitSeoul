@@ -496,7 +496,7 @@
   text-align: right;
 }
 
-.search-form button {
+.search-form > button {
   font: inherit;
   font-weight: 600;
   padding: 12px;
@@ -508,7 +508,7 @@
   box-shadow: rgba(108, 76, 241, 0.3) 0 8px 16px -6px;
 }
 
-.search-form button:disabled {
+.search-form > button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   box-shadow: none;
