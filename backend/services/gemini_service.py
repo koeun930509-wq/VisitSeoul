@@ -20,21 +20,29 @@ _SPOT_ITEM_SCHEMA = {
     "type": "object",
     "properties": {
         "name": {"type": "string"},
+        "search_keyword": {"type": "string"},
         "description": {"type": "string"},
         "why_this_weather": {"type": "string"},
     },
-    "required": ["name", "description", "why_this_weather"],
+    "required": ["name", "search_keyword", "description", "why_this_weather"],
 }
 
 _FOOD_ITEM_SCHEMA = {
     "type": "object",
     "properties": {
         "name": {"type": "string"},
+        "search_keyword": {"type": "string"},
         "menu": {"type": "string"},
         "why_this_weather": {"type": "string"},
     },
-    "required": ["name", "menu", "why_this_weather"],
+    "required": ["name", "search_keyword", "menu", "why_this_weather"],
 }
+
+_SEARCH_KEYWORD_GUIDE = (
+    "search_keyword는 name과 별개로, 지도 앱이나 관광 정보 사이트에서 검색했을 때 정확히 매칭될 "
+    "장소의 공식/고유 명칭만 간결하게 적으세요(수식어·설명 문구 제외). 예: name이 \"봉은사 미륵대불 정원\"이면 "
+    "search_keyword는 \"봉은사\"."
+)
 
 WEATHER_PICKS_COUNT = 6
 
@@ -115,6 +123,7 @@ def _generate_weather_picks(model: str, region: str, weather: dict, language: st
   폭염·한파면 도서관·박물관·실내 카페 등 실내 위주로, 맑고 선선하면 공원·전망대 등 야외 위주로 장소를 고르세요.
   관광 안내 책자에 잘 나오지 않는, 현지인이 즐겨 찾는 장소 위주로 추천하세요.
 - 각 추천마다 why_this_weather에 위 날씨 조건에서 왜 그 장소가 적합한지 이유를 제시하세요.
+- {_SEARCH_KEYWORD_GUIDE}
 """
     return _generate(model, prompt, _WEATHER_PICKS_SCHEMA)["items"]
 
@@ -156,6 +165,7 @@ def _generate_category_group(
 {category_lines}
 - 각 추천마다 why_this_weather에 위 날씨 조건에서 왜 그 장소가 적합한지 이유를 제시하세요
   (예: 비/폭염이면 실내·그늘 위주, 맑고 선선하면 야외 위주).
+- {_SEARCH_KEYWORD_GUIDE}
 """
     return _generate(model, prompt, _build_group_schema(interests))
 

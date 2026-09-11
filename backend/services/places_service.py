@@ -1,4 +1,6 @@
 import os
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 import requests
@@ -8,15 +10,33 @@ from services.visitseoul_service import get_contents
 
 DETAIL_URL_TEMPLATE = "https://korean.visitseoul.net/attractions/detail/{cid}"
 MAX_WORKERS = 16
+RETRY_COUNT = 1
+RETRY_DELAY_SECONDS = 0.2
 CONTENT_CACHE_TTL_SECONDS = 6 * 60 * 60  # 장소 사진/상세페이지 정보는 자주 바뀌지 않으므로 6시간 캐시
+
+# 비짓서울 API는 동시 요청이 많으면 500 에러를 반환할 만큼 동시성에 취약하다. 완전 직렬화하면
+# 응답이 너무 느려지므로(장소 수십 곳 기준 1분 이상), 동시 호출 수를 이 정도로만 낮춰
+# 속도와 성공률 사이의 절충을 잡고, 500이면 1회 재시도한다.
+_VISITSEOUL_CONCURRENCY = threading.Semaphore(4)
 
 
 def _fetch_visitseoul_content(name: str) -> dict | None:
     if not os.environ.get("VISIT_SEOUL_API_KEY"):
         return None
 
-    result = get_contents(keyword=name)
-    if result.get("result_code") != 200:
+    result = None
+    for attempt in range(RETRY_COUNT + 1):
+        try:
+            with _VISITSEOUL_CONCURRENCY:
+                result = get_contents(keyword=name)
+            break
+        except requests.HTTPError as e:
+            is_server_error = e.response is not None and e.response.status_code >= 500
+            if not is_server_error or attempt == RETRY_COUNT:
+                raise
+            time.sleep(RETRY_DELAY_SECONDS)
+
+    if result is None or result.get("result_code") != 200:
         return None
 
     items = result.get("data", [])
@@ -35,9 +55,10 @@ def find_visitseoul_content(name: str) -> dict | None:
 
 
 def _attach_photo(spot: dict) -> dict:
+    keyword = spot.get("search_keyword") or spot["name"]
     content = None
     try:
-        content = find_visitseoul_content(spot["name"])
+        content = find_visitseoul_content(keyword)
     except requests.RequestException:
         content = None
     photo_url = content.get("main_img") if content else None
