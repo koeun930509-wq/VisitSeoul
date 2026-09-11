@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { SEOUL_DISTRICTS, SEOUL_DISTRICT_AREAS, isSeoulRegion } from '../seoulDistricts'
 import { getDistrictLabel, getAreaLabel } from '../seoulDistrictsI18n'
 import { getStrings } from '../i18n'
@@ -76,54 +77,56 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
         </div>
       </div>
 
-      {showRegionSheet && (
-        <div className="region-sheet-overlay" onClick={() => setShowRegionSheet(false)}>
-          <div className="region-sheet" onClick={(e) => e.stopPropagation()}>
-            <div className="region-sheet-header">
-              <span>{t.regionSheetTitle}</span>
-              <button type="button" className="region-sheet-close" onClick={() => setShowRegionSheet(false)}>
-                {t.regionSheetClose}
-              </button>
-            </div>
-            <ul className="region-sheet-list">
-              <li>
-                <button
-                  type="button"
-                  className="region-sheet-option"
-                  onClick={() => {
-                    setRegion('서울')
-                    setShowRegionSheet(false)
-                  }}
-                >
-                  <span className={`region-radio${region === '서울' ? ' checked' : ''}`} aria-hidden="true" />
-                  {t.regionAllOption}
+      {showRegionSheet &&
+        createPortal(
+          <div className="region-sheet-overlay" onClick={() => setShowRegionSheet(false)}>
+            <div className="region-sheet" onClick={(e) => e.stopPropagation()}>
+              <div className="region-sheet-header">
+                <span>{t.regionSheetTitle}</span>
+                <button type="button" className="region-sheet-close" onClick={() => setShowRegionSheet(false)}>
+                  {t.regionSheetClose}
                 </button>
-              </li>
-              {SEOUL_DISTRICTS.map((r) => (
-                <li key={r}>
+              </div>
+              <ul className="region-sheet-list">
+                <li>
                   <button
                     type="button"
                     className="region-sheet-option"
                     onClick={() => {
-                      setRegion(`${r}(${SEOUL_DISTRICT_AREAS[r].join(', ')})`)
+                      setRegion('서울')
                       setShowRegionSheet(false)
                     }}
                   >
-                    <span className={`region-radio${isRegionSelected(r) ? ' checked' : ''}`} aria-hidden="true" />
-                    <span>
-                      {getDistrictLabel(language, r)}
-                      <span className="region-suggestion-areas">
-                        {' '}
-                        / {SEOUL_DISTRICT_AREAS[r].map((area) => getAreaLabel(language, area)).join(', ')}
-                      </span>
-                    </span>
+                    <span className={`region-radio${region === '서울' ? ' checked' : ''}`} aria-hidden="true" />
+                    {t.regionAllOption}
                   </button>
                 </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+                {SEOUL_DISTRICTS.map((r) => (
+                  <li key={r}>
+                    <button
+                      type="button"
+                      className="region-sheet-option"
+                      onClick={() => {
+                        setRegion(`${r}(${SEOUL_DISTRICT_AREAS[r].join(', ')})`)
+                        setShowRegionSheet(false)
+                      }}
+                    >
+                      <span className={`region-radio${isRegionSelected(r) ? ' checked' : ''}`} aria-hidden="true" />
+                      <span>
+                        {getDistrictLabel(language, r)}
+                        <span className="region-suggestion-areas">
+                          {' '}
+                          / {SEOUL_DISTRICT_AREAS[r].map((area) => getAreaLabel(language, area)).join(', ')}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>,
+          document.body
+        )}
 
       <div className="field">
         <div className="field-label-row">
