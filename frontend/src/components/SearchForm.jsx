@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { SEOUL_DISTRICTS, SEOUL_DISTRICT_AREAS, isSeoulRegion } from '../seoulDistricts'
 import { getDistrictLabel, getAreaLabel } from '../seoulDistrictsI18n'
@@ -14,22 +14,49 @@ function toDateInputValue(date) {
   return `${y}-${m}-${d}`
 }
 
-export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, language = 'ko' }) {
-  const t = getStrings(language)
-  const [region, setRegion] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [showRegionSheet, setShowRegionSheet] = useState(false)
+const TODAY = new Date()
+const MAX_DATE = new Date(TODAY)
+MAX_DATE.setDate(MAX_DATE.getDate() + MAX_FORECAST_DAYS - 1)
+const MIN_DATE_VALUE = toDateInputValue(TODAY)
+const MAX_DATE_VALUE = toDateInputValue(MAX_DATE)
+
+const MOBILE_QUERY = '(max-width: 560px)'
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches
+  )
 
   useEffect(() => {
-    if (presetRegion) setRegion(presetRegion)
-  }, [presetRegion])
-
-  const { min, max } = useMemo(() => {
-    const today = new Date()
-    const maxDate = new Date(today)
-    maxDate.setDate(maxDate.getDate() + MAX_FORECAST_DAYS - 1)
-    return { min: toDateInputValue(today), max: toDateInputValue(maxDate) }
+    const mql = window.matchMedia(MOBILE_QUERY)
+    const handler = (e) => setIsMobile(e.matches)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
   }, [])
+
+  return isMobile
+}
+
+export default function SearchForm({
+  region,
+  onRegionChange,
+  startDate,
+  onStartDateChange,
+  onSubmit,
+  loading,
+  presetRegion,
+  onLocate,
+  language = 'ko',
+}) {
+  const t = getStrings(language)
+  const isMobile = useIsMobile()
+  const [showRegionSheet, setShowRegionSheet] = useState(false)
+  const [showRegionList, setShowRegionList] = useState(false)
+  const [regionReadOnly, setRegionReadOnly] = useState(true)
+
+  useEffect(() => {
+    if (presetRegion) onRegionChange(presetRegion)
+  }, [presetRegion])
 
   function handleSubmit(e) {
     e?.preventDefault?.()
@@ -45,6 +72,18 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
     return region === '서울' ? false : region.startsWith(r)
   }
 
+  function handleRegionKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      setShowRegionList(false)
+      document.getElementById('date')?.focus()
+    }
+  }
+
+  function openRegionPicker() {
+    if (isMobile) setShowRegionSheet(true)
+  }
+
   return (
     <div className="search-form">
       <div className="field region-field">
@@ -53,31 +92,104 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
           <LocationToggle onLocate={onLocate} language={language} />
         </div>
         <div className="input-arrow-wrap">
-          <input
-            id="region"
-            name="trip-region"
-            type="text"
-            autoComplete="off"
-            readOnly
-            value={region}
-            onClick={() => setShowRegionSheet(true)}
-            placeholder={t.regionPlaceholder}
-            required
-          />
-          <button
-            type="button"
-            className="field-arrow-btn"
-            aria-label={t.regionLabel}
-            onClick={() => setShowRegionSheet(true)}
-          >
+          {isMobile ? (
+            <input
+              id="region"
+              name="trip-region"
+              type="text"
+              autoComplete="off"
+              readOnly
+              value={region}
+              onClick={openRegionPicker}
+              placeholder={t.regionPlaceholder}
+              required
+            />
+          ) : (
+            <input
+              id="region"
+              name="trip-region"
+              type="search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-bwignore="true"
+              readOnly={regionReadOnly}
+              value={region}
+              onChange={(e) => onRegionChange(e.target.value)}
+              onMouseDown={() => setRegionReadOnly(false)}
+              onFocus={(e) => {
+                setRegionReadOnly(false)
+                setShowRegionList(true)
+                e.target.readOnly = false
+              }}
+              onBlur={() => {
+                setRegionReadOnly(true)
+                setTimeout(() => setShowRegionList(false), 100)
+              }}
+              onKeyDown={handleRegionKeyDown}
+              placeholder={t.regionPlaceholder}
+              required
+            />
+          )}
+          {isMobile ? (
+            <button
+              type="button"
+              className="field-arrow-btn"
+              aria-label={t.regionLabel}
+              onClick={openRegionPicker}
+            >
+              <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          ) : (
             <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </button>
+          )}
         </div>
+
+        {!isMobile && showRegionList && (
+          <ul className="region-suggestions">
+            <li>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  onRegionChange('서울')
+                  setShowRegionList(false)
+                }}
+              >
+                {t.regionAllOption}
+              </button>
+            </li>
+            {SEOUL_DISTRICTS.map((r) => (
+              <li key={r}>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    onRegionChange(`${r}(${SEOUL_DISTRICT_AREAS[r].join(', ')})`)
+                    setShowRegionList(false)
+                  }}
+                >
+                  {getDistrictLabel(language, r)}
+                  <span className="region-suggestion-areas">
+                    {' '}
+                    / {SEOUL_DISTRICT_AREAS[r].map((area) => getAreaLabel(language, area)).join(', ')}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      {showRegionSheet &&
+      {isMobile &&
+        showRegionSheet &&
         createPortal(
           <div className="region-sheet-overlay" onClick={() => setShowRegionSheet(false)}>
             <div className="region-sheet" onClick={(e) => e.stopPropagation()}>
@@ -93,7 +205,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
                     type="button"
                     className="region-sheet-option"
                     onClick={() => {
-                      setRegion('서울')
+                      onRegionChange('서울')
                       setShowRegionSheet(false)
                     }}
                   >
@@ -107,7 +219,7 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
                       type="button"
                       className="region-sheet-option"
                       onClick={() => {
-                        setRegion(`${r}(${SEOUL_DISTRICT_AREAS[r].join(', ')})`)
+                        onRegionChange(`${r}(${SEOUL_DISTRICT_AREAS[r].join(', ')})`)
                         setShowRegionSheet(false)
                       }}
                     >
@@ -146,9 +258,9 @@ export default function SearchForm({ onSubmit, loading, presetRegion, onLocate, 
             type="date"
             className="date-input"
             value={startDate}
-            min={min}
-            max={max}
-            onChange={(e) => setStartDate(e.target.value)}
+            min={MIN_DATE_VALUE}
+            max={MAX_DATE_VALUE}
+            onChange={(e) => onStartDateChange(e.target.value)}
             required
           />
           <svg className="field-arrow-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
